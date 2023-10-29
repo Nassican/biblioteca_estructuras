@@ -28,7 +28,7 @@ class MiVentana(QMainWindow):
         right_layout = QVBoxLayout()
 
         # Agrega los elementos que desees en la mitad derecha
-        form_label = QLabel("Formulario:")
+        form_label = QLabel("Formulario Esteban:")
         name_input = QLineEdit()
         email_input = QLineEdit()
         submit_button = QPushButton("Enviar")
