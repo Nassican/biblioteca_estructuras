@@ -1,0 +1,44 @@
+[
+  {
+      "titulo": "El Gran Gatsby",
+      "autor": "F. Scott Fitzgerald",
+      "año_publicacion": 1925,
+      "genero": "Novela",
+      "editorial": "Charles Scribner's Sons"
+  },
+  {
+      "titulo": "Cien años de soledad",
+      "autor": "Gabriel García Márquez",
+      "año_publicacion": 1967,
+      "genero": "Realismo mágico",
+      "editorial": "Harper & Row"
+  },
+  {
+      "titulo": "Matar un ruiseñor",
+      "autor": "Harper Lee",
+      "año_publicacion": 1960,
+      "genero": "Novela",
+      "editorial": "J.B. Lippincott & Co."
+  },
+  {
+      "titulo": "1984",
+      "autor": "George Orwell",
+      "año_publicacion": 1949,
+      "genero": "Ciencia ficción",
+      "editorial": "Secker & Warburg"
+  },
+  {
+      "titulo": "Don Quijote de la Mancha",
+      "autor": "Miguel de Cervantes",
+      "año_publicacion": 1605,
+      "genero": "Novela picaresca",
+      "editorial": "Francisco de Robles"
+  },
+  {
+      "titulo": "Harry Potter y la piedra filosofal",
+      "autor": "J.K. Rowling",
+      "año_publicacion": 1997,
+      "genero": "Fantasía",
+      "editorial": "Bloomsbury"
+  }
+]
