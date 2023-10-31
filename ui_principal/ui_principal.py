@@ -21,28 +21,6 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import *
 from PySide6.QtCore import Qt, QThread, Signal, QPoint
 
-class BookWidgetVersionSoloTexto(QWidget):
-    def __init__(self, book_data):
-        super().__init__()
-
-        # Crea un layout vertical para el widget del libro
-        layout = QVBoxLayout()
-
-        # Crea etiquetas para mostrar los datos del libro
-        title_label = QLabel(f"Título: {book_data['titulo']}")
-        author_label = QLabel(f"Autor: {book_data['autor']}")
-        year_label = QLabel(f"Año: {book_data['año_publicacion']}")
-        genre_label = QLabel(f"Género: {book_data['genero']}")
-
-        # Agrega las etiquetas al layout vertical
-        layout.addWidget(title_label)
-        layout.addWidget(author_label)
-        layout.addWidget(year_label)
-        layout.addWidget(genre_label)
-
-        # Establece el layout para el widget
-        self.setLayout(layout)
-
 class MyBar(QWidget):
 
     def __init__(self, parent):
@@ -50,11 +28,15 @@ class MyBar(QWidget):
         self.parent = parent
         print(self.parent.width())
         self.principal_layuot = QVBoxLayout()
+        self.principal_layuot.setContentsMargins(0,0,0,0)
         self.layout = QHBoxLayout()
         self.layout.setContentsMargins(0,0,10,0)
 
-        btn_size = 30
+        # ----------------------------------------------------------------------
+        # Seccion de botones de la barra de titulo
+        btn_size = 25
 
+        # Boton de cerrar
         self.btn_close = QPushButton()
         path = os.path.join(os.path.dirname(__file__), "./images/CloseBtn.png")
         icon = QIcon(path)
@@ -64,6 +46,7 @@ class MyBar(QWidget):
         self.btn_close.setStyleSheet("QPushButton {border: 0px;} QPushButton::hover {background-color: #FF7777;}")
         self.btn_close.setCursor(Qt.PointingHandCursor)
 
+        # Boton de minimizar
         self.btn_min = QPushButton()
         path = os.path.join(os.path.dirname(__file__), "./images/MinimizeBtn.png")
         icon = QIcon(path)
@@ -73,6 +56,7 @@ class MyBar(QWidget):
         self.btn_min.setStyleSheet("QPushButton {border: 0px;} QPushButton::hover {background-color: #1C3D95;}")
         self.btn_min.setCursor(Qt.PointingHandCursor)
 
+        # Boton de maximizar
         self.btn_max = QPushButton()
         path_max = os.path.join(os.path.dirname(__file__), "./images/MaximizeBtn.png")
         self.icon_max = QIcon(path_max)
@@ -82,21 +66,18 @@ class MyBar(QWidget):
         self.btn_max.setStyleSheet("QPushButton {border: 0px;} QPushButton::hover {background-color: #1C3D95;}")
         self.btn_max.setCursor(Qt.PointingHandCursor)
 
+        # Icono de restaurar
         path_rest = os.path.join(os.path.dirname(__file__), "./images/RestoreDownBtn.png")
         self.icon_rest = QIcon(path_rest)
 
-        # Barra horizontal con botón y barra de búsqueda
+        # ----------------------------------------------------------------------
+        # BARRA DE TITULO (BOTON Y BARRA DE BUSQUEDA)
         bar_widget = QWidget()
         bar_widget.setMaximumHeight(50)
         bar_widget.setMinimumHeight(50)
-        #bar_widget.setStyleSheet("background-color: #999999; border-radius: 10px;")
-
-        #title_bar = MyBar(self)
-        #title_bar.setContentsMargins(0, 0, 0, 0)
 
         bar_layout = QHBoxLayout()
-        bar_layout.setAlignment(Qt.AlignTop)
-        bar_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        bar_layout.setAlignment(Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         bar_widget.setContentsMargins(0, 0, 0, 0)
         bar_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -104,13 +85,14 @@ class MyBar(QWidget):
         button = QPushButton("Biblioteca Softpro")
         button.setStyleSheet(
             "QPushButton {"
-            "background-color: #2F53D1; "
+            "background-color: transparent; "
             "color: white; "
             "border-radius: 0px; "
             "font-size: 28px; "
             "font-weight: bold; "
             "text-align: left; "  # Alinea el texto a la izquierda
             "padding-left: 10px;"
+            "border-radius: 20px;"
             "}"
         )
         button.setCursor(Qt.PointingHandCursor)
@@ -135,33 +117,109 @@ class MyBar(QWidget):
         search_button.setIcon(QIcon(icon_path))
         search_button.setFixedSize(30, 30)
 
-
-
         # Configura la alineación del botón y search_container en bar_layout
-        bar_layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignLeft)
-        bar_layout.addWidget(search_container, alignment=Qt.AlignmentFlag.AlignCenter)
+        bar_layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        bar_layout.addWidget(search_container, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
+        bar_layout.setContentsMargins(0, 2, 0, 0)
 
         search_layout.setContentsMargins(0, 0, 0, 0)
         search_layout.addWidget(search_button)
         search_layout.addWidget(search_bar)
 
-
         search_container.setLayout(search_layout)
         bar_widget.setLayout(bar_layout)
         bar_layout.setStretch(1, 2)
 
+        # ----------------------------------------------------------------------
+        # BARRA DE MENÚS DESPLEGABLES
+        menu_bar = QMenuBar()
+        menu_bar.setContentsMargins(0, 0, 0, 0)
+        menu_bar.setMaximumHeight(25)
+        menu_bar.setMinimumHeight(25)
+        menu_bar.setCursor(Qt.PointingHandCursor)
+
+        # Hoja de estilo a la barra de menú
+        menu_bar.setStyleSheet(
+            "QMenuBar { "
+            "background-color: #1C3D95;"
+            "color: white;"
+            "font-size: 14px;"
+            "padding-left: 10px;"
+            "}"
+            "QMenuBar::item:selected { "
+            "background-color: #2F53D1; "
+            "}"
+            )
+
+        # Menú 1
+        menu1 = QMenu("Categorias", self)
+        menu1.setStyleSheet(
+            "QMenu { "
+            "background-color: #2F53D1;"
+            "color: white;"
+            "font-size: 14px;"
+            "}"
+            "QMenu::item:selected { "
+            "background-color: #1C3D95; "
+            "}"
+            )
+        menu1.setCursor(Qt.PointingHandCursor)
+        # Opción 1.1 -----------------------------------------------------------
+        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
+        icon1_1 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
+        option_1_1 = QAction(icon1_1, "Opción 1.1", self)
+        option_1_1.triggered.connect(self.option_1_1)
+        menu1.addAction(option_1_1)
+
+        # Opción 1.2 -----------------------------------------------------------
+        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
+        icon1_2 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
+        option_1_2 = QAction(icon1_1, "Opción 1.2", self)
+        option_1_2.triggered.connect(self.option_1_2)
+        menu1.addAction(option_1_2)
+
+        # Menú 2
+        menu2 = QMenu("Ayuda", self)
+        menu2.setCursor(Qt.PointingHandCursor)
+        menu2.setStyleSheet(
+            "QMenu { "
+            "background-color: #2F53D1;"
+            "color: white;"
+            "font-size: 14px;"
+            "}"
+            "QMenu::item:selected { "
+            "background-color: #1C3D95; "
+            "}"
+        )
+        # Opción 2.1
+        menu2.addAction("Opción 2.1").triggered.connect(self.option_2_1)
+        # Opción 2.2
+        menu2.addAction("Opción 2.2").triggered.connect(self.option_2_2)
+
+        menu_bar.addMenu(menu1)
+        menu_bar.addMenu(menu2)
+
+        # ----------------------------------------------------------------------
+        # Agrega los widgets a la barra de título
         self.layout.addWidget(bar_widget)
         self.layout.addWidget(self.btn_min)
         self.layout.addWidget(self.btn_max)
         self.layout.addWidget(self.btn_close)
 
-        self.setLayout(self.layout)
+        # Agrega el layout a la ventana y la barra de menús desplegables
+        self.principal_layuot.addLayout(self.layout)
+        self.principal_layuot.addWidget(menu_bar)
 
+        # Establece el layout principal
+        self.setLayout(self.principal_layuot)
+
+        # ----------------------------------------------------------------------
+        # Inicializa los valores para el drag and drop
         self.start = QPoint(0, 0)
         self.pressing = False
 
-
-
+    # ----------------------------------------------------------------------
+    # FUNCIONES DE LA BARRA DE TITULO (DRAG AND DROP)
     def resizeEvent(self, QResizeEvent):
         super(MyBar, self).resizeEvent(QResizeEvent)
 
@@ -182,7 +240,6 @@ class MyBar(QWidget):
     def mouseReleaseEvent(self, QMouseEvent):
         self.pressing = False
 
-
     def btn_close_clicked(self):
         self.parent.close()
 
@@ -199,6 +256,20 @@ class MyBar(QWidget):
 
     def btn_min_clicked(self):
         self.parent.showMinimized()
+
+    # ----------------------------------------------------------------------
+    # FUNCIONES DE LA BARRA DE MENÚS DESPLEGABLES
+    def option_1_1(self):
+        print("Opción 1.1 seleccionada")
+
+    def option_1_2(self):
+        print("Opción 1.2 seleccionada")
+
+    def option_2_1(self):
+        print("Opción 2.1 seleccionada")
+
+    def option_2_2(self):
+        print("Opción 2.2 seleccionada")
 
 class ImageLoader(QThread):
     image_loaded = Signal(bytes)  # Señal para comunicar la imagen cargada
@@ -264,36 +335,9 @@ class Ui_principal(QMainWindow):
         icon = QIcon(path_icon)
         self.setWindowIcon(icon)
         self.setWindowFlags(Qt.FramelessWindowHint)
+
         # Barra horizontal con botón y barra de búsqueda
         self.interfaz()
-
-
-    def setup_grid_layout(self, widget):
-        # Crea un QGridLayout
-        grid_container = QWidget()
-        grid_layout = QGridLayout()
-
-        # Alinea los elementos en la parte superior
-        grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-        # Establece el espaciado entre elementos a 0
-        grid_layout.setSpacing(0)
-
-        # Crea dos QLabel
-        label1 = QLabel("Label 1:")
-        label2 = QLabel("Label 2:")
-
-        # Establece el texto en los QLabel
-        label1.setText("Texto en Label 1")
-        label2.setText("Texto en Label 2")
-
-        # Agrega los QLabel al QGridLayout
-        grid_layout.addWidget(label1, 0, 0)
-        grid_layout.addWidget(label2, 0, 1)
-
-        # Agrega el QGridLayout al QWidget
-        grid_container.setLayout(grid_layout)
-        widget.addWidget(grid_container)
 
     def fill_grid_layout(self, widget):
         #QScrollArea que contendrá el grid_layout
@@ -305,7 +349,7 @@ class Ui_principal(QMainWindow):
         scroll_content = QWidget()
         scroll_content.setContentsMargins(80, 0, 80, 0)
         scroll_area.setWidget(scroll_content)
-        scroll_area.setStyleSheet("QScrollArea{border: 0px;} QMessageBox{border: 0px;}")
+        scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
@@ -339,172 +383,18 @@ class Ui_principal(QMainWindow):
         # Agrega el QGridLayout al QWidget
         scroll_content.adjustSize()
 
-    def create_horizontal_bar(self, layout):
-        # Barra horizontal con botón y barra de búsqueda
-        bar_widget = QWidget()
-        bar_widget.setMaximumHeight(50)
-        bar_widget.setMinimumHeight(50)
-        #bar_widget.setStyleSheet("background-color: #999999; border-radius: 10px;")
-
-        #title_bar = MyBar(self)
-        #title_bar.setContentsMargins(0, 0, 0, 0)
-
-        bar_layout = QHBoxLayout()
-        bar_layout.setAlignment(Qt.AlignTop)
-        bar_layout.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        bar_widget.setContentsMargins(0, 0, 0, 0)
-        bar_layout.setContentsMargins(0, 0, 0, 0)
-
-        # Botón a la izquierda
-        button = QPushButton("Biblioteca Softpro")
-        button.setMaximumWidth(250)
-        button.setStyleSheet(
-            "QPushButton {"
-            "background-color: #2F53D1; "
-            "color: white; "
-            "border-radius: 0px; "
-            "font-size: 28px; "
-            "font-weight: bold; "
-            "text-align: left; "  # Alinea el texto a la izquierda
-            "padding-left: 10px;"
-            "}"
-        )
-        button.setCursor(Qt.PointingHandCursor)
-
-        # Barra de búsqueda en el centro
-        search_container = QWidget()
-        search_container.setFixedWidth(3000)
-        search_container.setFixedHeight(30)
-        search_container.setStyleSheet("background-color: #FFFFFF; border-radius: 10px;")
-
-        search_layout = QHBoxLayout()
-        search_layout.setSpacing(0)
-
-        search_bar = QLineEdit()
-        search_bar.setContentsMargins(0, 0, 0, 0)
-        search_bar.setStyleSheet("QLineEdit {font-size: 16px;}")
-        search_bar.setPlaceholderText("Buscar")
-
-        search_button = QPushButton()
-        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
-        search_button.setStyleSheet("QPushButton {border-radius: 10px;}")
-        search_button.setIcon(QIcon(icon_path))
-        search_button.setFixedSize(30, 30)
-
-
-
-        # Configura la alineación del botón y search_container en bar_layout
-        bar_layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignLeft)
-        bar_layout.addWidget(search_container, alignment=Qt.AlignmentFlag.AlignLeft)
-        #bar_layout.addWidget(title_bar, alignment=Qt.AlignmentFlag.AlignRight)
-
-        search_layout.setContentsMargins(0, 0, 0, 0)
-        search_layout.addWidget(search_button)
-        search_layout.addWidget(search_bar)
-
-
-        search_container.setLayout(search_layout)
-        bar_widget.setLayout(bar_layout)
-        layout.addWidget(bar_widget)
-
-    def create_menu_bar(self, layout):
-        menu_bar = self.menuBar()
-        menu_bar.setContentsMargins(0, 0, 0, 0)
-        menu_bar.setMaximumHeight(25)
-        menu_bar.setMinimumHeight(25)
-        menu_bar.setCursor(Qt.PointingHandCursor)
-        #Estilos
-
-        # Aplicar hoja de estilo a la barra de menú
-        menu_bar.setStyleSheet(
-            "QMenuBar { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 14px;"
-            "padding-left: 10px;"
-            "}"
-            "QMenuBar::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-            )
-
-        # Menú 1
-        menu1 = QMenu("Categorias", self)
-        menu1.setStyleSheet(
-            "QMenu { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 14px;"
-            "}"
-            "QMenu::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-            )
-        menu1.setCursor(Qt.PointingHandCursor)
-        # Opción 1.1 -----------------------------------------------------------
-        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
-        icon1_1 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
-        option_1_1 = QAction(icon1_1, "Opción 1.1", self)
-        option_1_1.triggered.connect(self.option_1_1)
-        menu1.addAction(option_1_1)
-
-
-        # Opción 1.2 -----------------------------------------------------------
-        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
-        icon1_2 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
-        option_1_2 = QAction(icon1_1, "Opción 1.2", self)
-        option_1_2.triggered.connect(self.option_1_2)
-        menu1.addAction(option_1_2)
-
-
-        # Menú 2
-        menu2 = QMenu("Ayuda", self)
-        menu2.setCursor(Qt.PointingHandCursor)
-        menu2.setStyleSheet(
-            "QMenu { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 14px;"
-            "}"
-            "QMenu::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-            )
-        # Opción 2.1
-        menu2.addAction("Opción 2.1").triggered.connect(self.option_2_1)
-        # Opción 2.2
-        menu2.addAction("Opción 2.2").triggered.connect(self.option_2_2)
-
-        menu_bar.addMenu(menu1)
-        menu_bar.addMenu(menu2)
-
-        layout.addWidget(menu_bar)
-
-    def option_1_1(self):
-        print("Opción 1.1 seleccionada")
-
-    def option_1_2(self):
-        print("Opción 1.2 seleccionada")
-
-    def option_2_1(self):
-        print("Opción 2.1 seleccionada")
-
-    def option_2_2(self):
-        print("Opción 2.2 seleccionada")
-
     def interfaz(self):
         central_widget = QWidget()
         central_vbox = QVBoxLayout()
         central_widget.setContentsMargins(0, 0, 0, 0)
         central_vbox.setContentsMargins(0, 0, 0, 0)
 
-
         central_widget.setLayout(central_vbox)
         central_vbox.setAlignment(Qt.AlignTop)
 
         navbars_widget = QWidget()
         navbars_layout = QVBoxLayout()
-        navbars_widget.setStyleSheet(f"background-color:{self.color_bar} ;")
+        navbars_widget.setStyleSheet(f"background-color:{self.color_bar};")
 
         navbars_layout.setAlignment(Qt.AlignTop)
         navbars_widget.setContentsMargins(0, 0, 0, 0)
@@ -514,7 +404,7 @@ class Ui_principal(QMainWindow):
         navbar = MyBar(self)
         navbars_layout.addWidget(navbar)
         # Agrega la barra de menús desplegables en la parte inferior
-        self.create_menu_bar(navbars_layout)
+        #self.create_menu_bar(navbars_layout)
         # ----------------------------------------------------------------
         navbars_widget.setLayout(navbars_layout)
         navbars_widget.setMaximumHeight(75)
@@ -522,7 +412,6 @@ class Ui_principal(QMainWindow):
 
         central_vbox.addWidget(navbars_widget)
         self.fill_grid_layout(central_vbox)
-
         self.setCentralWidget(central_widget)
 
 
