@@ -7,6 +7,8 @@ import os
 
 basedir = os.path.dirname(__file__)
 
+from ui_functions import register
+
 class MiVentana(QWidget):
     def __init__(self):
         super().__init__()
@@ -37,7 +39,7 @@ class MiVentana(QWidget):
         #Titulo
         lb_title = QLabel("Biblioteca\nSoftpro\n")
         font = QFont("Play", 36)
-        lb_title.setStyleSheet("color:blue")
+        lb_title.setStyleSheet("color:lightblue")
         #font = lb_title.font()
         #font.setPointSize(26)
         
@@ -60,16 +62,42 @@ class MiVentana(QWidget):
         #registrate
         hor_layout = QHBoxLayout(self)
         lb_tienes = QLabel("¿No tienes una cuenta?")
-        lb_registrate = QLabel()
+        bt_registrar = QPushButton("Registrar")
+        bt_registrar.setStyleSheet(
+            """
+            QPushButton {
+                background-color: lightblue;
+                border-style: outset;
+                border-width: 2px;
+                border-radius: 10px;
+                border-color: beige;
+                font: bold 12px;
+                min-width: 7em;
+                padding: 6px;
+            }
+            QPushButton:pressed {
+                background-color: white;
+                border-style: inset;
+            }
+            """
+        )
+
+        '''lb_registrate = QLabel()
         lb_registrate.setText('<a href="https://www.ejemplo.com">Registrar</a>')
         font_bold = lb_registrate.font()
         font_bold.setBold(True)
         lb_registrate.setFont(font_bold)
-        lb_registrate.setOpenExternalLinks(True)
+        lb_registrate.setOpenExternalLinks(True)'''
+
         hor_layout.addWidget(lb_tienes)
-        hor_layout.addWidget(lb_registrate)
+        hor_layout.addWidget(bt_registrar)
+        #hor_layout.addWidget(lb_registrate)
         grid_layout.addLayout(hor_layout, 5, 1)
-        lb_registrate.linkActivated.connect(self.open_new_window)
+        #lb_registrate.linkActivated.connect(self.open_new_window)
+
+        #Listeneres
+        bt_registrar.clicked.connect(lambda: register(self))
+
 
     def open_new_window(self, link):
         # Aquí puedes definir el comportamiento para abrir una nueva ventana en tu aplicación
