@@ -39,7 +39,7 @@ class MiVentana(QWidget):
         #Titulo
         lb_title = QLabel("Biblioteca\nSoftpro\n")
         font = QFont("Play", 36)
-        lb_title.setStyleSheet("color:lightblue")
+        lb_title.setStyleSheet("color:#2F53D1")
         #font = lb_title.font()
         #font.setPointSize(26)
         
@@ -60,13 +60,14 @@ class MiVentana(QWidget):
         led_pass.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         #registrate
-        hor_layout = QHBoxLayout(self)
+        hor_layout = QHBoxLayout()
         lb_tienes = QLabel("¿No tienes una cuenta?")
         bt_registrar = QPushButton("Registrar")
         bt_registrar.setStyleSheet(
             """
             QPushButton {
-                background-color: lightblue;
+                color: white;
+                background-color: #2F53D1;
                 border-style: outset;
                 border-width: 2px;
                 border-radius: 10px;
