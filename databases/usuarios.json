@@ -1,0 +1,52 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "username": "usuario1",
+      "nombre": "Juan",
+      "apellido": "Pérez",
+      "password": "clave123",
+      "rol": "usuario"
+    },
+    {
+      "id": 2,
+      "username": "usuario2",
+      "nombre": "María",
+      "apellido": "Gómez",
+      "password": "contraseña123",
+      "rol": "usuario"
+    },
+    {
+      "id": 3,
+      "username": "admin1",
+      "nombre": "Admin",
+      "apellido": "Admin",
+      "password": "admin123",
+      "rol": "admin"
+    },
+    {
+      "id": 4,
+      "username": "usuario3",
+      "nombre": "Carlos",
+      "apellido": "López",
+      "password": "password123",
+      "rol": "usuario"
+    },
+    {
+      "id": 5,
+      "username": "usuario4",
+      "nombre": "Ana",
+      "apellido": "Rodríguez",
+      "password": "claveSegura",
+      "rol": "usuario"
+    },
+    {
+      "id": 6,
+      "username": "usuario5",
+      "nombre": "Laura",
+      "apellido": "Martínez",
+      "password": "miPassword",
+      "rol": "usuario"
+    }
+  ]
+}

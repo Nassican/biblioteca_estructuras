@@ -363,7 +363,7 @@ class Ui_principal(QMainWindow):
         num_columns = 4  # Define el número de columnas en el QGridLayout
         row = 0  # Inicializa la fila en 0
         max_books_to_show = 12  # Define el número máximo de libros a mostrar
-        path_to_json = os.path.join(os.path.dirname(__file__), "./librosConImagenes.json")
+        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
 
         # Lee los datos de libros desde el archivo libros.json
         with open(path_to_json, "r", encoding="utf-8") as json_file:

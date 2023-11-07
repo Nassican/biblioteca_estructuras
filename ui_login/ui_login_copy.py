@@ -1,0 +1,515 @@
+import sys
+import os
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
+import backend
+
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+class MyBar(QWidget):
+
+    def __init__(self, parent):
+        super(MyBar, self).__init__()
+        self.parent = parent
+
+        self.principal_layout = QVBoxLayout()
+        self.principal_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.layout = QHBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
+        # Botón de cerrar
+        self.btn_close = QPushButton()
+        path = os.path.join(os.path.dirname(__file__), "./images/CloseBtn.png")
+        icon = QIcon(path)
+        self.btn_close.setIcon(icon)
+        self.btn_close.clicked.connect(self.btn_close_clicked)
+        self.btn_close.setFixedSize(25, 25)
+        self.btn_close.setStyleSheet("QPushButton {border: 0px;} QPushButton::hover {background-color: #FF7777;}")
+        self.btn_close.setCursor(Qt.PointingHandCursor)
+
+        # Botón de minimizar
+        self.btn_min = QPushButton()
+        path = os.path.join(os.path.dirname(__file__), "./images/MinimizeBtn.png")
+        icon = QIcon(path)
+        self.btn_min.setIcon(icon)
+        self.btn_min.clicked.connect(self.btn_min_clicked)
+        self.btn_min.setFixedSize(25, 25)
+        self.btn_min.setStyleSheet("QPushButton {border: 0px;} QPushButton::hover {background-color: #1C3D95;}")
+        self.btn_min.setCursor(Qt.PointingHandCursor)
+
+        # Botón de maximizar
+        self.btn_max = QPushButton()
+        path_max = os.path.join(os.path.dirname(__file__), "./images/MaximizeBtn.png")
+        self.icon_max = QIcon(path_max)
+        self.btn_max.setIcon(self.icon_max)
+        self.btn_max.clicked.connect(self.btn_max_clicked)
+        self.btn_max.setFixedSize(25, 25)
+        self.btn_max.setStyleSheet("QPushButton {border: 0px;} QPushButton::hover {background-color: #1C3D95;}")
+        self.btn_max.setCursor(Qt.PointingHandCursor)
+
+        icons_widget = QWidget()
+        icons_widget.setMaximumWidth(100)
+        icons_widget.setContentsMargins(0, 0, 0, 0)
+        icons_layout = QHBoxLayout()
+        icons_layout.setContentsMargins(0, 0, 0, 0)
+        icons_layout.addWidget(self.btn_min)
+        icons_layout.addWidget(self.btn_max)
+        icons_layout.addWidget(self.btn_close)
+        icons_widget.setLayout(icons_layout)
+        icons_layout.setAlignment(Qt.AlignRight)
+
+        name_library_widget = QLabel("Biblioteca SoftPro")
+        name_library_widget.setStyleSheet("color: white; font-size: 15px; font-weight: bold;")
+        name_library_widget.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+
+        self.layout.addWidget(name_library_widget)
+        self.layout.addWidget(icons_widget)
+
+        self.principal_layout.addLayout(self.layout)
+        self.setLayout(self.principal_layout)
+
+        self.start = QPoint(0, 0)
+        self.pressing = False
+
+    def resizeEvent(self, QResizeEvent):
+        super(MyBar, self).resizeEvent(QResizeEvent)
+
+    def mousePressEvent(self, event):
+        self.start = event.globalPos()
+        self.pressing = True
+
+    def mouseMoveEvent(self, event):
+        if self.pressing:
+            end = event.globalPos()
+            self.parent.move(self.parent.pos() + end - self.start)
+            self.start = end
+
+    def mouseReleaseEvent(self, QMouseEvent):
+        self.pressing = False
+
+    def btn_close_clicked(self):
+        self.parent.close()
+
+    def btn_max_clicked(self):
+        if self.parent.isMaximized():
+            self.btn_max.setIcon(self.icon_max)
+            self.parent.showNormal()
+        else:
+            self.parent.showMaximized()
+            path_rest = os.path.join(os.path.dirname(__file__), "./images/RestoreDownBtn.png")
+            self.icon_rest = QIcon(path_rest)
+            self.btn_max.setIcon(self.icon_rest)
+
+    def btn_min_clicked(self):
+        self.parent.showMinimized()
+
+class Login(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # Crear los widgets
+        self.label_logo = QLabel()
+        self.label_logo.setPixmap(QPixmap(os.path.join(basedir, "./img/logo_universidad_redimensioned.png")))
+        self.label_logo.setFixedHeight(100)
+        self.label_logo.setScaledContents(True)
+        self.label_logo.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+
+        self.label_user = QLabel("Usuario:")
+        self.line_edit_user = QLineEdit()
+        self.line_edit_user.setPlaceholderText("Usuario")
+
+        self.label_password = QLabel("Contraseña:")
+        self.line_edit_password = QLineEdit()
+        self.line_edit_password.setPlaceholderText("Contraseña")
+        self.line_edit_password.setEchoMode(QLineEdit.Password)
+
+        self.show_password_button = QPushButton()
+        self.show_password_button.setMaximumSize(50, 50)
+        self.show_password_button.setCursor(Qt.PointingHandCursor)
+        self.show_password_button.setCheckable(True)
+        self.show_password_button.toggled.connect(self.toggle_password_visibility)
+        self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+
+        self.contain_password = QWidget()
+        self.contain_password_layout = QHBoxLayout()
+        self.contain_password_layout.setContentsMargins(0, 0, 0, 0)
+        self.contain_password_layout.setSpacing(0)
+        self.contain_password_layout.addWidget(self.line_edit_password)
+        self.contain_password_layout.addWidget(self.show_password_button)
+        self.contain_password.setLayout(self.contain_password_layout)
+
+        self.contain_password.setStyleSheet(
+            "QWidget {"
+            "border: 2px solid black; "
+            "border-radius: 10px; "
+            "padding: 10px; "
+            "}"
+            "QPushButton {"
+            "background-color: transparent; "
+            "border: none; "
+            "padding: 5px;"
+            "}"
+        )
+        self.line_edit_password.setStyleSheet(
+            "background-color: transparent;"
+            "border: 0px;"
+            "border-radius: 10px; "
+            "padding: 7px; "
+            "font-size: 15px; "
+        )
+
+        self.button_login = QPushButton("Iniciar sesión")
+        self.button_login.setCursor(Qt.PointingHandCursor)
+
+        self.label_register = QLabel("¿No tienes cuenta?")
+        self.label_register_button = QPushButton("Regístrate")
+        self.label_register_button.setCursor(Qt.PointingHandCursor)
+
+        # Agregar los widgets al layout
+        separacion = 50
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.label_logo)
+        layout.addItem(QSpacerItem(separacion, separacion))
+        #layout.addWidget(self.label_user)
+        layout.addWidget(self.line_edit_user)
+        #layout.addWidget(self.label_password)
+        layout.addWidget(self.contain_password)
+        layout.addItem(QSpacerItem(separacion, separacion))
+        layout.addWidget(self.button_login)
+
+        layout_register = QHBoxLayout()
+        layout_register.setContentsMargins(0, separacion, 0, 0)
+        layout_register.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout_register.addWidget(self.label_register)
+        layout_register.addWidget(self.label_register_button)
+
+        layout.addLayout(layout_register)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.setStyleSheet(
+            "QLabel {"
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "} "
+            "QLineEdit {"
+            "border: 2px solid black; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+            )
+        self.label_register_button.setStyleSheet("background-color: white; color: #2F53D1; font-weight: bold; text-decoration: underline;")
+        self.setLayout(layout)
+
+    def toggle_password_visibility(self, checked):
+        if checked:
+            self.line_edit_password.setEchoMode(QLineEdit.Normal)
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-close.png")))
+        else:
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+            self.line_edit_password.setEchoMode(QLineEdit.Password)
+
+class Register(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        # Crear los widgets
+        self.label_logo = QLabel()
+        self.label_logo.setPixmap(QPixmap(os.path.join(basedir, "./img/logo_universidad_redimensioned.png")))
+        self.label_logo.setFixedHeight(100)
+        self.label_logo.setScaledContents(True)
+        self.label_logo.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+
+        self.label_ident = QLabel("Identificación:")
+        self.line_edit_ident = QLineEdit()
+        self.line_edit_ident.setPlaceholderText("Número de identificación")
+
+        self.label_user = QLabel("Usuario:")
+        self.line_edit_user = QLineEdit()
+        self.line_edit_user.setPlaceholderText("Usuario")
+
+        self.label_names = QLabel("Nombre:")
+        self.line_edit_names = QLineEdit()
+        self.line_edit_names.setPlaceholderText("Nombre - Apellido")
+
+        self.label_cellphone_number = QLabel("Celular")
+        self.line_edit_cellphone_number = QLineEdit()
+        self.line_edit_cellphone_number.setPlaceholderText("Celular")
+
+        self.label_password = QLabel("Contraseña:")
+        self.line_edit_password = QLineEdit()
+        self.line_edit_password.setPlaceholderText("Contraseña")
+        self.line_edit_password.setEchoMode(QLineEdit.Password)
+
+        self.show_password_button = QPushButton()
+        self.show_password_button.setMaximumSize(50, 50)
+        self.show_password_button.setCursor(Qt.PointingHandCursor)
+        self.show_password_button.setCheckable(True)
+        self.show_password_button.toggled.connect(self.toggle_password_visibility)
+        self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+
+        self.contain_password = QWidget()
+        self.contain_password_layout = QHBoxLayout()
+        self.contain_password_layout.setContentsMargins(0, 0, 0, 0)
+        self.contain_password_layout.setSpacing(0)
+        self.contain_password_layout.addWidget(self.line_edit_password)
+        self.contain_password_layout.addWidget(self.show_password_button)
+        self.contain_password.setLayout(self.contain_password_layout)
+
+        self.contain_password.setStyleSheet(
+            "QWidget {"
+            "border: 2px solid black; "
+            "border-radius: 10px; "
+            "padding: 10px; "
+            "}"
+            "QPushButton {"
+            "background-color: transparent; "
+            "border: none; "
+            "padding: 5px;"
+            "}"
+        )
+        self.line_edit_password.setStyleSheet(
+            "background-color: transparent;"
+            "border: 0px;"
+            "border-radius: 10px; "
+            "padding: 7px; "
+            "font-size: 15px; "
+        )
+
+        self.label_confirm_password = QLabel("Confirmar Contraseña:")
+        self.line_edit_confirm_password = QLineEdit()
+        self.line_edit_confirm_password.setPlaceholderText("Confirmar Contraseña")
+        self.line_edit_confirm_password.setEchoMode(QLineEdit.Password)
+
+        self.show_confirm_password_button = QPushButton()
+        self.show_confirm_password_button.setMaximumSize(50, 50)
+        self.show_confirm_password_button.setCursor(Qt.PointingHandCursor)
+        self.show_confirm_password_button.setCheckable(True)
+        self.show_confirm_password_button.toggled.connect(self.toggle_confirm_password_visibility)
+        self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+
+        self.contain_confirm_password = QWidget()
+        self.contain_confirm_password_layout = QHBoxLayout()
+        self.contain_confirm_password_layout.setContentsMargins(0, 0, 0, 0)
+        self.contain_confirm_password_layout.setSpacing(0)
+        self.contain_confirm_password_layout.addWidget(self.line_edit_confirm_password)
+        self.contain_confirm_password_layout.addWidget(self.show_confirm_password_button)
+        self.contain_confirm_password.setLayout(self.contain_confirm_password_layout)
+
+        self.contain_confirm_password.setStyleSheet(
+            "QWidget {"
+            "border: 2px solid black; "
+            "border-radius: 10px; "
+            "padding: 10px; "
+            "}"
+            "QPushButton {"
+            "background-color: transparent; "
+            "border: none; "
+            "padding: 5px;"
+            "}"
+        )
+        self.line_edit_confirm_password.setStyleSheet(
+            "background-color: transparent;"
+            "border: 0px;"
+            "border-radius: 10px; "
+            "padding: 7px; "
+            "font-size: 15px; "
+        )
+
+        self.button_register = QPushButton("Registrarse")
+        self.button_register.setCursor(Qt.PointingHandCursor)
+
+        self.label_login = QLabel("¿Ya tienes cuenta?")
+        self.label_login_button = QPushButton("Iniciar Sesion")
+        self.label_login_button.setCursor(Qt.PointingHandCursor)
+
+        # Agregar los widgets al layout
+        separacion = 30
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.label_logo)
+        layout.addItem(QSpacerItem(separacion, separacion))
+        layout.addWidget(self.line_edit_ident)
+        layout.addWidget(self.line_edit_user)
+        layout.addWidget(self.line_edit_names)
+        layout.addWidget(self.line_edit_cellphone_number)
+
+        #layout.addWidget(self.label_password)
+        layout.addWidget(self.contain_password)
+        layout.addWidget(self.contain_confirm_password)
+        layout.addItem(QSpacerItem(separacion, separacion))
+        layout.addWidget(self.button_register)
+
+        layout_register = QHBoxLayout()
+        layout_register.setContentsMargins(0, separacion, 0, 0)
+        layout_register.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout_register.addWidget(self.label_login)
+        layout_register.addWidget(self.label_login_button)
+
+        layout.addLayout(layout_register)
+        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.setStyleSheet(
+            "QLabel {"
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "} "
+            "QLineEdit {"
+            "border: 2px solid black; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+            )
+        self.label_login_button.setStyleSheet("background-color: white; color: #2F53D1; font-weight: bold; text-decoration: underline;")
+        self.setLayout(layout)
+
+    def toggle_password_visibility(self, checked):
+        if checked:
+            self.line_edit_password.setEchoMode(QLineEdit.Normal)
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-close.png")))
+        else:
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+            self.line_edit_password.setEchoMode(QLineEdit.Password)
+
+    def toggle_confirm_password_visibility(self, checked):
+        if checked:
+            self.line_edit_confirm_password.setEchoMode(QLineEdit.Normal)
+            self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-close.png")))
+        else:
+            self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+            self.line_edit_confirm_password.setEchoMode(QLineEdit.Password)
+
+class MiVentana(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Login")
+        self.setStyleSheet("background-color: white")
+        self.setGeometry(50, 50, 800, 600)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.login()
+
+    def login(self):
+        central_layout = QHBoxLayout()
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+
+        lb_logo = QLabel(self)
+        lb_logo.setContentsMargins(0, 0, 0, 0)
+        logo = QPixmap(os.path.join(basedir, "./img/libros-fondo.jpg"))  # Agrega la extensión del archivo de imagen
+        lb_logo.setPixmap(logo)
+        lb_logo.setScaledContents(True)
+        lb_logo.setMinimumHeight(500)
+        lb_logo.setMinimumWidth(600)
+
+        login_widget = QWidget()
+        login_widget.setMinimumWidth(400)
+        login_widget.setContentsMargins(0, 0, 0, 0)
+        login_layout = QVBoxLayout()
+        login_layout.setSpacing(0)
+        login_layout.setContentsMargins(0, 0, 0, 0)
+        login_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        bar_widget = QWidget()
+        bar_widget.setContentsMargins(0, 0, 0, 0)
+        bar_widget.setStyleSheet("background-color: #2F53D1;")
+        bar_layout = QHBoxLayout()
+
+        bar_title = MyBar(self)
+        bar_title.setContentsMargins(0, 0, 0, 0)
+        bar_title.setMaximumHeight(40)
+        bar_layout.addWidget(bar_title)
+        bar_widget.setLayout(bar_layout)
+
+        login_form_widget = QWidget()
+        login_form_widget.setContentsMargins(0, 0, 0, 0)
+
+        self.stacked_widget = QStackedWidget()
+        self.login_widget = Login()
+        self.register_widget = Register()
+
+        self.stacked_widget.addWidget(self.login_widget)
+        self.stacked_widget.addWidget(self.register_widget)
+
+        self.stacked_widget.setContentsMargins(60, 0, 60, 0)
+        self.label_register_button = self.login_widget.label_register_button
+        self.label_register_button.clicked.connect(self.on_register_button_clicked)
+        
+        self.login_widget.button_login.clicked.connect(self.loguearse_button_clicked)
+
+        self.label_login_button = self.register_widget.label_login_button
+        self.label_login_button.clicked.connect(self.on_login_button_clicked)
+
+        login_layout.addWidget(bar_widget)
+        login_layout.addWidget(self.stacked_widget)
+        login_widget.setLayout(login_layout)
+
+        central_layout.addWidget(lb_logo)
+        central_layout.addWidget(login_widget)
+
+        self.setLayout(central_layout)
+
+    def open_new_window(self, link):
+        QMessageBox.information(self, "Enlace Activado", f"Enlace activado: {link}")
+
+    def on_login_button_clicked(self):
+        self.stacked_widget.setCurrentWidget(self.login_widget)
+
+    def on_register_button_clicked(self):
+        self.stacked_widget.setCurrentWidget(self.register_widget)
+
+    def loguearse_button_clicked(self):
+        username = self.login_widget.line_edit_user.text()
+        password = self.login_widget.line_edit_password.text()
+
+        authenticated = backend.verificar_credenciales(username, password)
+
+        if authenticated:
+            print("Autenticado correctamente.")
+            print(f"¡Bienvenido, {authenticated['nombre']} {authenticated['apellido']}!")
+            if authenticated['rol'] == 'admin':
+                print("Eres un administrador.")
+            else:
+                print("Eres un usuario estándar.")
+        else:
+            # Mostrar un mensaje de error en caso de autenticación fallida.
+            QMessageBox.warning(self, 'Error de autenticación', 'Credenciales incorrectas. Por favor, inténtelo de nuevo.')
+
+def main():
+    app = QApplication(sys.argv)
+    window = MiVentana()
+    window.show()
+    sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
