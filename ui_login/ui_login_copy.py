@@ -3,10 +3,15 @@ import os
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
-import backend
-
 
 basedir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append('../')
+try:
+    from ui_login import backend
+    from ui_principal.ui_principal import Ui_principal
+except ImportError:
+    print("Error al importar el archivo ui_principal.py")
+
 
 class MyBar(QWidget):
 
@@ -22,7 +27,7 @@ class MyBar(QWidget):
 
         # Botón de cerrar
         self.btn_close = QPushButton()
-        path = os.path.join(os.path.dirname(__file__), "./images/CloseBtn.png")
+        path = os.path.join(os.path.dirname(__file__), "../media/images/CloseBtn.png")
         icon = QIcon(path)
         self.btn_close.setIcon(icon)
         self.btn_close.clicked.connect(self.btn_close_clicked)
@@ -32,7 +37,7 @@ class MyBar(QWidget):
 
         # Botón de minimizar
         self.btn_min = QPushButton()
-        path = os.path.join(os.path.dirname(__file__), "./images/MinimizeBtn.png")
+        path = os.path.join(os.path.dirname(__file__), "../media/images/MinimizeBtn.png")
         icon = QIcon(path)
         self.btn_min.setIcon(icon)
         self.btn_min.clicked.connect(self.btn_min_clicked)
@@ -42,7 +47,7 @@ class MyBar(QWidget):
 
         # Botón de maximizar
         self.btn_max = QPushButton()
-        path_max = os.path.join(os.path.dirname(__file__), "./images/MaximizeBtn.png")
+        path_max = os.path.join(os.path.dirname(__file__), "../media/images/MaximizeBtn.png")
         self.icon_max = QIcon(path_max)
         self.btn_max.setIcon(self.icon_max)
         self.btn_max.clicked.connect(self.btn_max_clicked)
@@ -99,7 +104,7 @@ class MyBar(QWidget):
             self.parent.showNormal()
         else:
             self.parent.showMaximized()
-            path_rest = os.path.join(os.path.dirname(__file__), "./images/RestoreDownBtn.png")
+            path_rest = os.path.join(os.path.dirname(__file__), "../media/images/RestoreDownBtn.png")
             self.icon_rest = QIcon(path_rest)
             self.btn_max.setIcon(self.icon_rest)
 
@@ -112,7 +117,7 @@ class Login(QWidget):
 
         # Crear los widgets
         self.label_logo = QLabel()
-        self.label_logo.setPixmap(QPixmap(os.path.join(basedir, "./img/logo_universidad_redimensioned.png")))
+        self.label_logo.setPixmap(QPixmap(os.path.join(basedir, "../media/img/logo_universidad_redimensioned.png")))
         self.label_logo.setFixedHeight(100)
         self.label_logo.setScaledContents(True)
         self.label_logo.setAlignment(Qt.AlignmentFlag.AlignHCenter)
@@ -131,7 +136,7 @@ class Login(QWidget):
         self.show_password_button.setCursor(Qt.PointingHandCursor)
         self.show_password_button.setCheckable(True)
         self.show_password_button.toggled.connect(self.toggle_password_visibility)
-        self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+        self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
 
         self.contain_password = QWidget()
         self.contain_password_layout = QHBoxLayout()
@@ -221,9 +226,9 @@ class Login(QWidget):
     def toggle_password_visibility(self, checked):
         if checked:
             self.line_edit_password.setEchoMode(QLineEdit.Normal)
-            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-close.png")))
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-close.png")))
         else:
-            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
             self.line_edit_password.setEchoMode(QLineEdit.Password)
 
 class Register(QWidget):
@@ -232,7 +237,7 @@ class Register(QWidget):
 
         # Crear los widgets
         self.label_logo = QLabel()
-        self.label_logo.setPixmap(QPixmap(os.path.join(basedir, "./img/logo_universidad_redimensioned.png")))
+        self.label_logo.setPixmap(QPixmap(os.path.join(basedir, "../media/img/logo_universidad_redimensioned.png")))
         self.label_logo.setFixedHeight(100)
         self.label_logo.setScaledContents(True)
         self.label_logo.setAlignment(Qt.AlignmentFlag.AlignHCenter)
@@ -263,7 +268,7 @@ class Register(QWidget):
         self.show_password_button.setCursor(Qt.PointingHandCursor)
         self.show_password_button.setCheckable(True)
         self.show_password_button.toggled.connect(self.toggle_password_visibility)
-        self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+        self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
 
         self.contain_password = QWidget()
         self.contain_password_layout = QHBoxLayout()
@@ -303,7 +308,7 @@ class Register(QWidget):
         self.show_confirm_password_button.setCursor(Qt.PointingHandCursor)
         self.show_confirm_password_button.setCheckable(True)
         self.show_confirm_password_button.toggled.connect(self.toggle_confirm_password_visibility)
-        self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+        self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
 
         self.contain_confirm_password = QWidget()
         self.contain_confirm_password_layout = QHBoxLayout()
@@ -397,17 +402,17 @@ class Register(QWidget):
     def toggle_password_visibility(self, checked):
         if checked:
             self.line_edit_password.setEchoMode(QLineEdit.Normal)
-            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-close.png")))
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-close.png")))
         else:
-            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+            self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
             self.line_edit_password.setEchoMode(QLineEdit.Password)
 
     def toggle_confirm_password_visibility(self, checked):
         if checked:
             self.line_edit_confirm_password.setEchoMode(QLineEdit.Normal)
-            self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-close.png")))
+            self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-close.png")))
         else:
-            self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "./img/eye-open.png")))
+            self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
             self.line_edit_confirm_password.setEchoMode(QLineEdit.Password)
 
 class MiVentana(QWidget):
@@ -426,7 +431,7 @@ class MiVentana(QWidget):
 
         lb_logo = QLabel(self)
         lb_logo.setContentsMargins(0, 0, 0, 0)
-        logo = QPixmap(os.path.join(basedir, "./img/libros-fondo.jpg"))  # Agrega la extensión del archivo de imagen
+        logo = QPixmap(os.path.join(basedir, "../media/img/libros-fondo.jpg"))  # Agrega la extensión del archivo de imagen
         lb_logo.setPixmap(logo)
         lb_logo.setScaledContents(True)
         lb_logo.setMinimumHeight(500)
@@ -464,7 +469,7 @@ class MiVentana(QWidget):
         self.stacked_widget.setContentsMargins(60, 0, 60, 0)
         self.label_register_button = self.login_widget.label_register_button
         self.label_register_button.clicked.connect(self.on_register_button_clicked)
-        
+
         self.login_widget.button_login.clicked.connect(self.loguearse_button_clicked)
 
         self.label_login_button = self.register_widget.label_login_button
@@ -478,9 +483,6 @@ class MiVentana(QWidget):
         central_layout.addWidget(login_widget)
 
         self.setLayout(central_layout)
-
-    def open_new_window(self, link):
-        QMessageBox.information(self, "Enlace Activado", f"Enlace activado: {link}")
 
     def on_login_button_clicked(self):
         self.stacked_widget.setCurrentWidget(self.login_widget)
@@ -497,6 +499,10 @@ class MiVentana(QWidget):
         if authenticated:
             print("Autenticado correctamente.")
             print(f"¡Bienvenido, {authenticated['nombre']} {authenticated['apellido']}!")
+            ventana = Ui_principal(authenticated)
+            self.close()
+            ventana.show()
+
             if authenticated['rol'] == 'admin':
                 print("Eres un administrador.")
             else:

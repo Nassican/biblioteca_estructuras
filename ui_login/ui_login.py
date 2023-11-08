@@ -1,8 +1,7 @@
 import sys
-from PySide6.QtWidgets import*
-from PySide6.QtGui import*
-from PySide6.QtCore import*
-import sys
+from PySide6.QtWidgets import *
+from PySide6.QtGui import *
+from PySide6.QtCore import *
 import os
 
 basedir = os.path.dirname(__file__)

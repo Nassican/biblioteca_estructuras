@@ -16,16 +16,19 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QLabel,
     QMessageBox,
-    QScrollArea
+    QScrollArea,
+    QSizePolicy,
+    QSpacerItem
 )
 from PySide6.QtGui import *
 from PySide6.QtCore import Qt, QThread, Signal, QPoint
 
 class MyBar(QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, user_data):
         super(MyBar, self).__init__()
         self.parent = parent
+        self.user_data = user_data
         print(self.parent.width())
         self.principal_layuot = QVBoxLayout()
         self.principal_layuot.setContentsMargins(0,0,0,0)
@@ -38,7 +41,7 @@ class MyBar(QWidget):
 
         # Boton de cerrar
         self.btn_close = QPushButton()
-        path = os.path.join(os.path.dirname(__file__), "./images/CloseBtn.png")
+        path = os.path.join(os.path.dirname(__file__), "../media/images/CloseBtn.png")
         icon = QIcon(path)
         self.btn_close.setIcon(QIcon(icon))
         self.btn_close.clicked.connect(self.btn_close_clicked)
@@ -48,7 +51,7 @@ class MyBar(QWidget):
 
         # Boton de minimizar
         self.btn_min = QPushButton()
-        path = os.path.join(os.path.dirname(__file__), "./images/MinimizeBtn.png")
+        path = os.path.join(os.path.dirname(__file__), "../media/images/MinimizeBtn.png")
         icon = QIcon(path)
         self.btn_min.setIcon(QIcon(icon))
         self.btn_min.clicked.connect(self.btn_min_clicked)
@@ -58,7 +61,7 @@ class MyBar(QWidget):
 
         # Boton de maximizar
         self.btn_max = QPushButton()
-        path_max = os.path.join(os.path.dirname(__file__), "./images/MaximizeBtn.png")
+        path_max = os.path.join(os.path.dirname(__file__), "../media/images/MaximizeBtn.png")
         self.icon_max = QIcon(path_max)
         self.btn_max.setIcon(QIcon(self.icon_max))
         self.btn_max.clicked.connect(self.btn_max_clicked)
@@ -67,7 +70,7 @@ class MyBar(QWidget):
         self.btn_max.setCursor(Qt.PointingHandCursor)
 
         # Icono de restaurar
-        path_rest = os.path.join(os.path.dirname(__file__), "./images/RestoreDownBtn.png")
+        path_rest = os.path.join(os.path.dirname(__file__), "../media/images/RestoreDownBtn.png")
         self.icon_rest = QIcon(path_rest)
 
         # ----------------------------------------------------------------------
@@ -112,7 +115,7 @@ class MyBar(QWidget):
         search_bar.setPlaceholderText("Buscar")
 
         search_button = QPushButton()
-        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
+        icon_path = os.path.join(os.path.dirname(__file__), "../media/img/lupa.png")
         search_button.setStyleSheet("QPushButton {border-radius: 10px;}")
         search_button.setIcon(QIcon(icon_path))
         search_button.setFixedSize(30, 30)
@@ -132,6 +135,8 @@ class MyBar(QWidget):
 
         # ----------------------------------------------------------------------
         # BARRA DE MENÚS DESPLEGABLES
+        menu_layout = QHBoxLayout()
+        menu_layout.setSpacing(0)
         menu_bar = QMenuBar()
         menu_bar.setContentsMargins(0, 0, 0, 0)
         menu_bar.setMaximumHeight(25)
@@ -165,14 +170,14 @@ class MyBar(QWidget):
             )
         menu1.setCursor(Qt.PointingHandCursor)
         # Opción 1.1 -----------------------------------------------------------
-        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
+        icon_path = os.path.join(os.path.dirname(__file__), "../media/img/lupa.png")
         icon1_1 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
         option_1_1 = QAction(icon1_1, "Opción 1.1", self)
         option_1_1.triggered.connect(self.option_1_1)
         menu1.addAction(option_1_1)
 
         # Opción 1.2 -----------------------------------------------------------
-        icon_path = os.path.join(os.path.dirname(__file__), "./img/lupa.png")
+        icon_path = os.path.join(os.path.dirname(__file__), "../media/img/lupa.png")
         icon1_2 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
         option_1_2 = QAction(icon1_1, "Opción 1.2", self)
         option_1_2.triggered.connect(self.option_1_2)
@@ -196,8 +201,62 @@ class MyBar(QWidget):
         # Opción 2.2
         menu2.addAction("Opción 2.2").triggered.connect(self.option_2_2)
 
+
+        #Menu 3 - MENU PERFIL
+        menuPerfil = QMenu("Perfil", self)
+        menuPerfil.setCursor(Qt.PointingHandCursor)
+        menuPerfil.setStyleSheet(
+            "QMenu { "
+            "background-color: #2F53D1;"
+            "color: white;"
+            "font-size: 14px;"
+            "}"
+            "QMenu::item:selected { "
+            "background-color: #1C3D95; "
+            "}"
+        )
+
         menu_bar.addMenu(menu1)
         menu_bar.addMenu(menu2)
+
+        menu_bar_perfil = QMenuBar()
+        menu_bar_perfil.setContentsMargins(0, 0, 0, 0)
+        menu_bar_perfil.setMaximumHeight(25)
+        menu_bar_perfil.setMinimumHeight(25)
+        menu_bar_perfil.setCursor(Qt.PointingHandCursor)
+        # Hoja de estilo a la barra de menú
+        menu_bar_perfil.setStyleSheet(
+            "QMenuBar { "
+            "background-color: #1C3D95;"
+            "color: white;"
+            "font-size: 15px;"
+            "padding-left: 10px;"
+            "font-weight: bold;"
+            "}"
+            "QMenuBar::item:selected { "
+            "background-color: #2F53D1; "
+            "}"
+            )
+
+        menuPerfilUsuario = QMenu(f" {self.user_data['nombre']} ", self)
+        menuPerfilUsuario.setStyleSheet(
+            "QMenu { "
+            "background-color: #2F53D1;"
+            "color: red;"
+            "font-size: 14px;"
+            "}"
+            "QMenu::item:selected { "
+            "background-color: #1C3D95; "
+            "}"
+            )
+        
+
+        menu_bar_perfil.addMenu(menuPerfilUsuario)
+
+        menu_layout.addWidget(menu_bar)
+        menu_layout.addWidget(menu_bar_perfil)
+        menu_layout.setStretch(0, 1)
+
 
         # ----------------------------------------------------------------------
         # Agrega los widgets a la barra de título
@@ -208,7 +267,7 @@ class MyBar(QWidget):
 
         # Agrega el layout a la ventana y la barra de menús desplegables
         self.principal_layuot.addLayout(self.layout)
-        self.principal_layuot.addWidget(menu_bar)
+        self.principal_layuot.addLayout(menu_layout)
 
         # Establece el layout principal
         self.setLayout(self.principal_layuot)
@@ -325,19 +384,59 @@ class BookWidget(QWidget):
 
 class Ui_principal(QMainWindow):
     color_bar = "#2F53D1"
-    def __init__(self):
+    def __init__(self, user_data=None):
         super().__init__()
+        #print(user_data)
+        self.user_data = user_data
+        mensaje = QMessageBox()
+        boton_aceptar = QPushButton("Aceptar")
+        boton_aceptar.setCursor(Qt.PointingHandCursor)
+        mensaje.setText("Debes iniciar sesión para acceder a la biblioteca")
+        mensaje.setWindowTitle("Biblioteca SoftPro - Error")
+        mensaje.addButton(boton_aceptar, QMessageBox.AcceptRole)
+        mensaje.setIcon(QMessageBox.Critical)
+        mensaje.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/libro.png")))
+
+        mensaje.setStyleSheet(
+            "QMessageBox{ "
+            "border: 10px;"
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+            )
+
+        if user_data:
+            self.interfaz()
+        else:
+            mensaje.exec()
+            sys.exit(1)
 
         self.setWindowTitle("Bienvenido a Biblioteca Softpro")
-        self.setGeometry(100, 100, 1280, 720)
+        self.setGeometry(50, 50, 1280, 720)
         self.setMinimumSize(1280, 720)
-        path_icon = os.path.join(os.path.dirname(__file__), "./img/libro.png")
+        path_icon = os.path.join(os.path.dirname(__file__), "../media/img/libro.png")
         icon = QIcon(path_icon)
         self.setWindowIcon(icon)
         self.setWindowFlags(Qt.FramelessWindowHint)
 
+
         # Barra horizontal con botón y barra de búsqueda
-        self.interfaz()
+
 
     def fill_grid_layout(self, widget):
         #QScrollArea que contendrá el grid_layout
@@ -388,6 +487,7 @@ class Ui_principal(QMainWindow):
         central_vbox = QVBoxLayout()
         central_widget.setContentsMargins(0, 0, 0, 0)
         central_vbox.setContentsMargins(0, 0, 0, 0)
+        central_vbox.setSpacing(0)
 
         central_widget.setLayout(central_vbox)
         central_vbox.setAlignment(Qt.AlignTop)
@@ -401,7 +501,7 @@ class Ui_principal(QMainWindow):
         navbars_layout.setContentsMargins(0, 0, 0, 0)
         # ------- Barra horizontal con botón y barra de búsqueda -------
         # Agrega la barra horizontal con botón y barra de búsqueda en la parte superior
-        navbar = MyBar(self)
+        navbar = MyBar(self, self.user_data)
         navbars_layout.addWidget(navbar)
         # Agrega la barra de menús desplegables en la parte inferior
         #self.create_menu_bar(navbars_layout)
@@ -413,6 +513,7 @@ class Ui_principal(QMainWindow):
         central_vbox.addWidget(navbars_widget)
         self.fill_grid_layout(central_vbox)
         self.setCentralWidget(central_widget)
+        print(self.user_data)
 
 
 def main():
