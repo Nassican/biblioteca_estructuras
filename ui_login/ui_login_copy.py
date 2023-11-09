@@ -1,5 +1,6 @@
 import sys
 import os
+import re
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
@@ -245,6 +246,7 @@ class Register(QWidget):
         self.label_ident = QLabel("Identificación:")
         self.line_edit_ident = QLineEdit()
         self.line_edit_ident.setPlaceholderText("Número de identificación")
+        self.line_edit_ident.setValidator(QIntValidator())
 
         self.label_user = QLabel("Usuario:")
         self.line_edit_user = QLineEdit()
@@ -257,6 +259,8 @@ class Register(QWidget):
         self.label_cellphone_number = QLabel("Celular")
         self.line_edit_cellphone_number = QLineEdit()
         self.line_edit_cellphone_number.setPlaceholderText("Celular")
+        self.line_edit_cellphone_number.setValidator(QIntValidator())
+        self.line_edit_cellphone_number.setMaxLength(10)
 
         self.label_password = QLabel("Contraseña:")
         self.line_edit_password = QLineEdit()
@@ -338,8 +342,14 @@ class Register(QWidget):
             "font-size: 15px; "
         )
 
+        # Conecta la señal textChanged del QLineEdit de confirmación de contraseña
+        self.line_edit_confirm_password.textChanged.connect(self.validate_password)
+        # Almacena la última contraseña válida
+        self.validated_password = ""
+
         self.button_register = QPushButton("Registrarse")
         self.button_register.setCursor(Qt.PointingHandCursor)
+        self.button_register.clicked.connect(self.boton_register_pressed)
 
         self.label_login = QLabel("¿Ya tienes cuenta?")
         self.label_login_button = QPushButton("Iniciar Sesion")
@@ -396,6 +406,22 @@ class Register(QWidget):
             "background-color: #2F5777"
             "}"
             )
+        self.stylebutton_login_register = (
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
         self.label_login_button.setStyleSheet("background-color: white; color: #2F53D1; font-weight: bold; text-decoration: underline;")
         self.setLayout(layout)
 
@@ -415,11 +441,116 @@ class Register(QWidget):
             self.show_confirm_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
             self.line_edit_confirm_password.setEchoMode(QLineEdit.Password)
 
+    def validate_password(self):
+        password = self.line_edit_password.text()
+        confirm_password = self.line_edit_confirm_password.text()
+
+        if password == confirm_password:
+            self.contain_confirm_password.setStyleSheet(
+                "QWidget {"
+                "border: 2px solid black; "
+                "border-radius: 10px; "
+                "padding: 10px; "
+                "}"
+                "QPushButton {"
+                "background-color: transparent; "
+                "border: none; "
+                "padding: 5px;"
+                "}"
+                )  # Borra el estilo de texto rojo
+            self.button_register.setEnabled(True)  # Habilita el botón de registro
+            self.button_register.setStyleSheet(self.stylebutton_login_register)
+            self.validated_password = password
+        else:
+            # Establece un estilo de texto rojo para indicar que no coinciden
+            self.contain_confirm_password.setStyleSheet(
+                "QWidget {"
+                "border: 2px solid #991515; "
+                "border-radius: 10px; "
+                "padding: 10px; "
+                "}"
+                "QPushButton {"
+                "background-color: transparent; "
+                "border: none; "
+                "padding: 5px;"
+                "}"
+            )
+            self.button_register.setEnabled(False)  # Deshabilita el botón de registro
+            self.button_register.setStyleSheet("background-color: #7995F9;")  # Establece el color de texto gris
+            self.validated_password = ""
+
+    def boton_register_pressed(self):
+        ident = self.line_edit_ident.text()
+        username = self.line_edit_user.text()
+        names = self.line_edit_names.text()
+        cellphone_number = self.line_edit_cellphone_number.text()
+        password = self.validated_password
+
+        alert_message = QMessageBox()
+        alert_message.setWindowTitle("Error en formulario de registro")
+        alert_message.setWindowIcon(QIcon(os.path.join(basedir, "../media/img/libro.png")))
+        alert_message.setIcon(QMessageBox.Critical)
+        alert_message_button = QPushButton("Aceptar")
+        alert_message_button.setCursor(Qt.PointingHandCursor)
+        alert_message.addButton(alert_message_button, QMessageBox.YesRole)
+        alert_message.setStyleSheet(
+            "QMessageBox{ "
+            "border: 10px;"
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+
+        if not ident and not username and not names and not cellphone_number and not password:
+            alert_message.setText("Todos los campos son obligatorios.")
+            alert_message.exec()
+        elif not ident:
+            alert_message.setText("El campo de identificación no puede estar vacío.")
+            alert_message.exec()
+        elif not username:
+            alert_message.setText("El campo de usuario no puede estar vacío.")
+            alert_message.exec()
+        elif not names:
+            alert_message.setText("El campo de nombre no puede estar vacío.")
+            alert_message.exec()
+        elif not cellphone_number:
+            alert_message.setText("El campo de celular no puede estar vacío.")
+            alert_message.exec()
+        elif not password:
+            alert_message.setText("El campo de contraseña no puede estar vacío.")
+            alert_message.exec()
+        elif len(cellphone_number) < 10:
+            alert_message.setText("El número de celular debe tener 10 dígitos.")
+            alert_message.exec()
+        else:
+            print("Registro exitoso")
+
+
+
+
+
+
 class MiVentana(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Login")
         self.setStyleSheet("background-color: white")
+
         self.setGeometry(50, 50, 800, 600)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.login()
