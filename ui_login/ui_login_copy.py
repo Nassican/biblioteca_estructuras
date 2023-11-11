@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+import json
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 from PySide6.QtCore import *
@@ -486,6 +487,7 @@ class Register(QWidget):
         cellphone_number = self.line_edit_cellphone_number.text()
         password = self.validated_password
 
+
         alert_message = QMessageBox()
         alert_message.setWindowTitle("Error en formulario de registro")
         alert_message.setWindowIcon(QIcon(os.path.join(basedir, "../media/img/libro.png")))
@@ -537,13 +539,42 @@ class Register(QWidget):
         elif len(cellphone_number) < 10:
             alert_message.setText("El número de celular debe tener 10 dígitos.")
             alert_message.exec()
+        elif backend.id_personal_esta_disponible(int(ident)) == False:
+            alert_message.setText("El número de identificación ya está en uso.")
+            alert_message.exec()
+        elif backend.usuario_esta_disponible(username) == False:
+            alert_message.setText("El nombre de usuario ya está en uso.")
+            alert_message.exec()
         else:
-            print("Registro exitoso")
-
-
-
-
-
+            uuid_generated = backend.generate_uuid()
+            new_user = {
+                "uuid": uuid_generated,
+                "id_personal": int(ident),
+                "username": username,
+                "nombre": names,
+                "celular": cellphone_number,
+                "password": password,
+                "rol": "usuario"
+            }
+            #print(new_user)
+            #print(f"Registro exitoso con uuid: {uuid_generated}")
+            try:
+                backend.register_user_in_database(new_user)
+                alert_message.setWindowTitle("Registro exitoso")
+                alert_message.setIcon(QMessageBox.Information)
+                alert_message.setText("Registro exitoso.")
+                alert_message.exec()
+                self.line_edit_ident.setText("")
+                self.line_edit_user.setText("")
+                self.line_edit_names.setText("")
+                self.line_edit_cellphone_number.setText("")
+                self.line_edit_password.setText("")
+                self.line_edit_confirm_password.setText("")
+            except Exception as e:
+                print(e)
+                alert_message.setIcon(QMessageBox.Critical)
+                alert_message.setText("Ha ocurrido un error al registrar el usuario.")
+                alert_message.exec()
 
 class MiVentana(QWidget):
     def __init__(self):
@@ -629,7 +660,7 @@ class MiVentana(QWidget):
 
         if authenticated:
             print("Autenticado correctamente.")
-            print(f"¡Bienvenido, {authenticated['nombre']} {authenticated['apellido']}!")
+            print(f"¡Bienvenido, {authenticated['nombre']}!")
             ventana = Ui_principal(authenticated)
             self.close()
             ventana.show()

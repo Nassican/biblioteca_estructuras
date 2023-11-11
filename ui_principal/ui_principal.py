@@ -17,8 +17,8 @@ from PySide6.QtWidgets import (
     QLabel,
     QMessageBox,
     QScrollArea,
-    QSizePolicy,
-    QSpacerItem
+    QDialog,
+    QGraphicsDropShadowEffect
 )
 from PySide6.QtGui import *
 from PySide6.QtCore import Qt, QThread, Signal, QPoint
@@ -29,7 +29,6 @@ class MyBar(QWidget):
         super(MyBar, self).__init__()
         self.parent = parent
         self.user_data = user_data
-        print(self.parent.width())
         self.principal_layuot = QVBoxLayout()
         self.principal_layuot.setContentsMargins(0,0,0,0)
         self.layout = QHBoxLayout()
@@ -202,24 +201,13 @@ class MyBar(QWidget):
         menu2.addAction("Opción 2.2").triggered.connect(self.option_2_2)
 
 
-        #Menu 3 - MENU PERFIL
-        menuPerfil = QMenu("Perfil", self)
-        menuPerfil.setCursor(Qt.PointingHandCursor)
-        menuPerfil.setStyleSheet(
-            "QMenu { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 14px;"
-            "}"
-            "QMenu::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-        )
 
         menu_bar.addMenu(menu1)
         menu_bar.addMenu(menu2)
 
+        # Barra de perfil de usuario
         menu_bar_perfil = QMenuBar()
+        menu_bar_perfil.setLayoutDirection(Qt.RightToLeft)
         menu_bar_perfil.setContentsMargins(0, 0, 0, 0)
         menu_bar_perfil.setMaximumHeight(25)
         menu_bar_perfil.setMinimumHeight(25)
@@ -231,7 +219,9 @@ class MyBar(QWidget):
             "color: white;"
             "font-size: 15px;"
             "padding-left: 10px;"
+            "padding-right: 10px;"
             "font-weight: bold;"
+            "text-align: center;"
             "}"
             "QMenuBar::item:selected { "
             "background-color: #2F53D1; "
@@ -242,16 +232,45 @@ class MyBar(QWidget):
         menuPerfilUsuario.setStyleSheet(
             "QMenu { "
             "background-color: #2F53D1;"
-            "color: red;"
+            "color: white;"
             "font-size: 14px;"
+            "padding: 0px;"
+            "margin: 0px;"
+            "text-align: center;"
             "}"
             "QMenu::item:selected { "
             "background-color: #1C3D95; "
             "}"
+            "QMenu::item {"
+            "font-weight: bold;"
+            "font-size: 15px;"
+            "padding: 5px;"
+            "padding-left: 40px;"
+            "padding-right: 10px;"
+            "}"
+            "QMenu::icon {"
+            "padding-left: 20px;"
+            "}"
             )
-        
+
 
         menu_bar_perfil.addMenu(menuPerfilUsuario)
+
+        # Opción Ver Perfil -----------------------------------------------------------
+
+
+        # Opción Cerrar Sesión -----------------------------------------------------------
+        menu_cerrar_sesion = QAction("Cerrar Sesión", self)
+        menu_cerrar_sesion.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/logout.svg")))
+        menu_cerrar_sesion.triggered.connect(self.close_session)
+
+        menu_perfil_usuario = QAction("Ver Perfil", self)
+        menu_perfil_usuario.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/user.png")))
+        menu_perfil_usuario.triggered.connect(self.option_1_1)
+
+        menuPerfilUsuario.addAction(menu_perfil_usuario)
+        menuPerfilUsuario.addAction(menu_cerrar_sesion)
+
 
         menu_layout.addWidget(menu_bar)
         menu_layout.addWidget(menu_bar_perfil)
@@ -316,6 +335,13 @@ class MyBar(QWidget):
     def btn_min_clicked(self):
         self.parent.showMinimized()
 
+    def mostrar_menu(self):
+        # Obtener la posición del botón de menú
+        pos = self.menu_bar.mapToGlobal(self.boton_menu.geometry().bottomLeft())
+
+        # Configurar la posición del menú
+        self.menu.exec_(pos)
+
     # ----------------------------------------------------------------------
     # FUNCIONES DE LA BARRA DE MENÚS DESPLEGABLES
     def option_1_1(self):
@@ -330,8 +356,16 @@ class MyBar(QWidget):
     def option_2_2(self):
         print("Opción 2.2 seleccionada")
 
+    def close_session(self):
+        self.parent.close()
+        from ui_login.ui_login_copy import MiVentana
+        window = MiVentana()
+        window.show()
+
+
 class ImageLoader(QThread):
     image_loaded = Signal(bytes)  # Señal para comunicar la imagen cargada
+    loading_finished = Signal()  # Señal para comunicar que la carga ha finalizado
 
     def __init__(self, image_url):
         super().__init__()
@@ -341,6 +375,7 @@ class ImageLoader(QThread):
         response = requests.get(self.image_url)
         if response.status_code == 200:
             self.image_loaded.emit(response.content)
+        self.loading_finished.emit()
 
 class BookWidget(QWidget):
     def __init__(self, book_data):
@@ -357,12 +392,20 @@ class BookWidget(QWidget):
 
         # Crea un layout vertical para el widget del libro
         layout = QVBoxLayout()
+        self.image_label.setStyleSheet(
+            "QLabel {"
+            "   background-color: white;"
+            "   border-radius: 10px;"
+            "   padding: 10px;"
+            "}"
+        )
 
         # Agrega la etiqueta de imagen al layout
         layout.addWidget(self.image_label)
 
         # Establece el layout para el widget
         self.setLayout(layout)
+        self.add_shadow()
         self.book_data = book_data
 
     def set_image(self, image_data):
@@ -372,15 +415,115 @@ class BookWidget(QWidget):
         self.image_label.setPixmap(scaled_pixmap)
         self.image_label.setAlignment(Qt.AlignCenter)
         self.image_label.setCursor(Qt.PointingHandCursor)
+        shadow = self.add_shadow()
+        self.image_label.setGraphicsEffect(shadow)
         self.image_label.mousePressEvent = self.show_book_info  # Conecta el evento de clic
+
+    def add_shadow(self):
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(5)  # Ajusta según tus preferencias
+        shadow.setColor(Qt.black)
+        shadow.setOffset(0, 0)
+
+        return shadow
 
 
     def show_book_info(self, event):
-        # Muestra una ventana emergente con la información del libro
-        info = self.book_data
+        book_widget = BookInfoWidget(self.book_data)
+        book_widget.exec()
+
+class BookInfoWidget(QDialog):
+    def __init__(self, book_data):
+        super().__init__()
+        width = 400
+        height = 250
+        self.width = width
+        self.height = height
+        self.setMaximumSize(width, height)
+        self.setMinimumSize(width, height)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setStyleSheet(
+            "QDialog {"
+            "background-color: white;"
+            "border: 5px solid #2F53D1;"
+            "}"
+            "QLabel {"
+            "font-size: 16px;"
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+        # Crea un layout vertical para el widget del libro
+        layout = QHBoxLayout()
+
+        self.image_label = QLabel()
+        self.image_label.setGraphicsEffect(QGraphicsDropShadowEffect(blurRadius=20, xOffset=0, yOffset=0))
+        self.image_label.setMaximumSize(width/2, height)
+        image_url = book_data.get("imagen_url", "")
+        self.image_loader = ImageLoader(image_url)
+        # Conecta la señal para cargar la imagen al método que maneja la imagen cargada
+        self.image_loader.image_loaded.connect(self.set_image)
+        # Agrega la etiqueta de imagen al layout
+        self.image_loader.start()
+        layout.addWidget(self.image_label)
+
+        layout_info = QVBoxLayout()
+        # Establece el layout para el widget
+        info = book_data
         info_text = f"Título: {info['titulo']}\nAutor: {info['autor']}\nAño: {info['año_publicacion']}\nGénero: {info['genero']}\nEditorial: {info['editorial']}"
-        msg_box = QMessageBox()
-        msg_box.information(self, "Información del libro", info_text)
+        info_label = QLabel(info_text, self)
+        info_label.setWordWrap(True)
+        info_label.setMaximumWidth(width/2)
+        layout_info.addWidget(info_label)
+        layout_info.setAlignment(Qt.AlignTop)
+
+        # Agregar un botón de cierre
+        close_button = QPushButton("Cerrar", self)
+        close_button.setCursor(Qt.PointingHandCursor)
+        close_button.setMaximumHeight(30)
+        close_button.setLayoutDirection(Qt.RightToLeft)
+        close_button.clicked.connect(self.close)
+        layout_info.addWidget(close_button)
+
+        layout.addLayout(layout_info)
+        self.setLayout(layout)
+        #print(book_data)
+
+    def set_image(self, image_data):
+        pixmap = QPixmap()
+        pixmap.loadFromData(image_data)
+        scaled_pixmap = pixmap.scaled(self.image_label.size(),Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        self.image_label.setPixmap(scaled_pixmap)
+        self.image_label.setAlignment(Qt.AlignCenter)
+        shadow = self.add_shadow()
+        self.image_label.setGraphicsEffect(shadow)
+
+    def add_shadow(self):
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(20)  # Ajusta según tus preferencias
+        shadow.setColor(Qt.black)
+        shadow.setOffset(0, 0)
+
+        return shadow
+
+    def show_widget(self):
+        self.show()
+
+
 
 class Ui_principal(QMainWindow):
     color_bar = "#2F53D1"
@@ -513,7 +656,7 @@ class Ui_principal(QMainWindow):
         central_vbox.addWidget(navbars_widget)
         self.fill_grid_layout(central_vbox)
         self.setCentralWidget(central_widget)
-        print(self.user_data)
+        #print(self.user_data)
 
 
 def main():

@@ -1,7 +1,4 @@
 import sys
-import json
-import os
-import requests
 
 from PySide6.QtWidgets import *
 from PySide6.QtGui import *

@@ -1,51 +1,75 @@
 {
   "usuarios": [
     {
-      "id": 1,
+      "uuid": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "id_personal": 1,
       "username": "usuario1",
       "nombre": "Juan",
-      "apellido": "Pérez",
-      "password": "clave123",
+      "cellphone": "123456789",
+      "password": "contrase\u00f1a123",
       "rol": "usuario"
     },
     {
-      "id": 2,
+      "uuid": "7aed13d4-422d-4a4f-973e-cd97d92bb10e",
+      "id_personal": 2,
       "username": "usuario2",
-      "nombre": "María",
-      "apellido": "Gómez",
-      "password": "contraseña123",
+      "nombre": "Mar\u00eda",
+      "cellphone": "987654321",
+      "password": "password456",
       "rol": "usuario"
     },
     {
-      "id": 3,
-      "username": "admin1",
-      "nombre": "AdminSapullezMercedes",
-      "apellido": "Admin",
-      "password": "admin123",
-      "rol": "admin"
-    },
-    {
-      "id": 4,
+      "uuid": "8bb4e02e-9146-48ec-8e9b-83775344b958",
+      "id_personal": 3,
       "username": "usuario3",
-      "nombre": "Carlos",
-      "apellido": "López",
-      "password": "password123",
+      "nombre": "Pedro",
+      "cellphone": "5551234567",
+      "password": "securepass",
       "rol": "usuario"
     },
     {
-      "id": 5,
+      "uuid": "baa0cbcf-0fbc-46cc-9435-9473d2078e1f",
+      "id_personal": 4,
       "username": "usuario4",
       "nombre": "Ana",
-      "apellido": "Rodríguez",
-      "password": "claveSegura",
+      "cellphone": "7890123456",
+      "password": "myp@ssw0rd",
       "rol": "usuario"
     },
     {
-      "id": 6,
+      "uuid": "68b9d2e2-48ed-4c91-b02e-5b45866ab20f",
+      "id_personal": 5,
       "username": "usuario5",
-      "nombre": "Laura",
-      "apellido": "Martínez",
-      "password": "miPassword",
+      "nombre": "Carlos",
+      "cellphone": "1112223333",
+      "password": "p@ssw0rd123",
+      "rol": "usuario"
+    },
+    {
+      "uuid": "667501f9-dc89-416f-bf7d-11376e282ad4",
+      "id_personal": 213,
+      "username": "123",
+      "nombre": "123",
+      "celular": "1231231231",
+      "password": "123",
+      "rol": "usuario"
+    },
+    {
+      "uuid": "8fc9eb58-0eab-4c91-8fbc-12859087f7bf",
+      "id_personal": 1001095132,
+      "username": "Nassican",
+      "nombre": "Jesus Benavides",
+      "celular": "3126625663",
+      "password": "123123",
+      "rol": "usuario"
+    },
+    {
+      "uuid": "b43a5527-1181-4396-a742-964c60d03105",
+      "id_personal": 100109513,
+      "username": "Nassica",
+      "nombre": "Jesus David",
+      "celular": "3126625663",
+      "password": "123",
       "rol": "usuario"
     }
   ]
