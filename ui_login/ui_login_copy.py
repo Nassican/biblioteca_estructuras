@@ -233,8 +233,6 @@ class Login(QWidget):
             self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
             self.line_edit_password.setEchoMode(QLineEdit.Password)
 
-
-
 class Register(QWidget):
     def __init__(self):
         super().__init__()
@@ -686,30 +684,41 @@ class MiVentana(QWidget):
             "background-color: #2F5777"
             "}"
         )
+        try:
+            if username == "" or password == "":
+                self.message.setWindowTitle("Biblioteca SoftPro - Error")
+                self.message.setText("Usuario o contraseña incompletos.")
+                self.message.exec()
+                return
 
-        if username == "" or password == "":
-            self.message.setWindowTitle("Biblioteca SoftPro - Error")
-            self.message.setText("Usuario o contraseña incompletos.")
-            self.message.exec()
-            return
+            authenticated = backend.verificar_credenciales(username, password)
 
-        authenticated = backend.verificar_credenciales(username, password)
+            if authenticated:
+                print("Autenticado correctamente.")
+                print(f"¡Bienvenido, {authenticated['nombre']}!")
+                try:
+                    ventana = Ui_principal(authenticated)
+                    ventana.show()
+                except Exception as e:
+                    print(e)
+                    self.message.setWindowTitle("Biblioteca SoftPro - Error")
+                    self.message.setText("Ha ocurrido un error al intentar iniciar sesión.")
+                    self.message.exec()
 
-        if authenticated:
-            print("Autenticado correctamente.")
-            print(f"¡Bienvenido, {authenticated['nombre']}!")
-            ventana = Ui_principal(authenticated)
-            self.close()
-            ventana.show()
-
-            if authenticated['rol'] == 'admin':
-                print("Eres un administrador.")
+                if authenticated['rol'] == 'admin':
+                    print("Eres un administrador.")
+                else:
+                    print("Eres un usuario estándar.")
+                self.close()
             else:
-                print("Eres un usuario estándar.")
-        else:
-            # Mostrar un mensaje de error en caso de autenticación fallida.
+                # Mostrar un mensaje de error en caso de autenticación fallida.
+                self.message.setWindowTitle("Biblioteca SoftPro - Error")
+                self.message.setText("Usuario o contraseña incorrectos.")
+                self.message.exec()
+        except Exception as e:
+            print(e)
             self.message.setWindowTitle("Biblioteca SoftPro - Error")
-            self.message.setText("Usuario o contraseña incorrectos.")
+            self.message.setText("Ha ocurrido un error al intentar iniciar sesión.")
             self.message.exec()
 
 

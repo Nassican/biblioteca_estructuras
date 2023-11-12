@@ -25,7 +25,12 @@ from PySide6.QtWidgets import (
     QFileDialog,
 )
 from PySide6.QtGui import *
-from PySide6.QtCore import Qt, QThread, Signal, QPoint
+from PySide6.QtCore import Qt, QThread, Signal, QPoint, QCoreApplication
+try:
+    from ui_principal.ui_dashboard import SideMenu
+    print("Exito al importar el SideMenu")
+except ImportError:
+    print("Error al importar el archivo ui_dashboard.py")
 
 class MyBar(QWidget):
 
@@ -136,167 +141,6 @@ class MyBar(QWidget):
         bar_widget.setLayout(bar_layout)
         bar_layout.setStretch(1, 2)
 
-        # ----------------------------------------------------------------------
-        # BARRA DE MENÚS DESPLEGABLES
-        menu_layout = QHBoxLayout()
-        menu_layout.setSpacing(0)
-        menu_bar = QMenuBar()
-        menu_bar.setContentsMargins(0, 0, 0, 0)
-        menu_bar.setMaximumHeight(25)
-        menu_bar.setMinimumHeight(25)
-        menu_bar.setCursor(Qt.PointingHandCursor)
-
-        # Hoja de estilo a la barra de menú
-        menu_bar.setStyleSheet(
-            "QMenuBar { "
-            "background-color: #1C3D95;"
-            "color: white;"
-            "font-size: 14px;"
-            "padding-left: 10px;"
-            "}"
-            "QMenuBar::item:selected { "
-            "background-color: #2F53D1; "
-            "}"
-            )
-
-        # Menú 1
-        menu1 = QMenu("Categorias", self)
-        menu1.setStyleSheet(
-            "QMenu { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 15px;"
-            "padding: 0px;"
-            "margin: 0px;"
-            "text-align: center;"
-            "}"
-            "QMenu::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-            "QMenu::item {"
-            "font-size: 15px;"
-            "padding: 5px;"
-            "padding-right: 10px;"
-            "}"
-            "QMenu::icon {"
-            "padding-left: 10px;"
-            "}"
-            )
-        menu1.setCursor(Qt.PointingHandCursor)
-        # Opción 1.1 -----------------------------------------------------------
-        icon_path = os.path.join(os.path.dirname(__file__), "../media/img/lupa.png")
-        icon1_1 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
-        option_1_1 = QAction(icon1_1, "Opción 1.1", self)
-        option_1_1.triggered.connect(self.option_1_1)
-        menu1.addAction(option_1_1)
-
-        # Opción 1.2 -----------------------------------------------------------
-        icon_path = os.path.join(os.path.dirname(__file__), "../media/img/lupa.png")
-        icon1_2 = QIcon(icon_path)  # Reemplaza con la ruta al ícono
-        option_1_2 = QAction(icon1_1, "Opción 1.2", self)
-        option_1_2.triggered.connect(self.option_1_2)
-        menu1.addAction(option_1_2)
-
-        # Menú 2
-        menu2 = QMenu("Ayuda", self)
-        menu2.setCursor(Qt.PointingHandCursor)
-        menu2.setStyleSheet(
-            "QMenu { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 15px;"
-            "padding: 0px;"
-            "margin: 0px;"
-            "text-align: center;"
-            "}"
-            "QMenu::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-            "QMenu::item {"
-            "font-size: 15px;"
-            "padding: 5px;"
-            "padding-right: 10px;"
-            "}"
-            "QMenu::icon {"
-            "padding-left: 10px;"
-            "}"
-        )
-        # Opción 2.1
-        menu2.addAction("Opción 2.1").triggered.connect(self.option_2_1)
-        # Opción 2.2
-        menu2.addAction("Opción 2.2").triggered.connect(self.option_2_2)
-
-
-
-        menu_bar.addMenu(menu1)
-        menu_bar.addMenu(menu2)
-
-        # Barra de perfil de usuario
-        menu_bar_perfil = QMenuBar()
-        menu_bar_perfil.setLayoutDirection(Qt.RightToLeft)
-        menu_bar_perfil.setContentsMargins(0, 0, 0, 0)
-        menu_bar_perfil.setMaximumHeight(25)
-        menu_bar_perfil.setMinimumHeight(25)
-        menu_bar_perfil.setCursor(Qt.PointingHandCursor)
-        # Hoja de estilo a la barra de menú
-        menu_bar_perfil.setStyleSheet(
-            "QMenuBar { "
-            "background-color: #1C3D95;"
-            "color: white;"
-            "font-size: 15px;"
-            "padding-left: 10px;"
-            "padding-right: 10px;"
-            "font-weight: bold;"
-            "text-align: center;"
-            "}"
-            "QMenuBar::item:selected { "
-            "background-color: #2F53D1; "
-            "}"
-            )
-
-        menuPerfilUsuario = QMenu(f" {self.user_data['nombre']} ", self)
-        menuPerfilUsuario.setStyleSheet(
-            "QMenu { "
-            "background-color: #2F53D1;"
-            "color: white;"
-            "font-size: 15px;"
-            "padding: 0px;"
-            "margin: 0px;"
-            "text-align: center;"
-            "}"
-            "QMenu::item:selected { "
-            "background-color: #1C3D95; "
-            "}"
-            "QMenu::item {"
-            "font-size: 15px;"
-            "padding: 5px;"
-            "padding-left: 40px;"
-            "padding-right: 10px;"
-            "}"
-            "QMenu::icon {"
-            "padding-left: 20px;"
-            "}"
-            )
-
-        menu_bar_perfil.addMenu(menuPerfilUsuario)
-
-        # Opción Cerrar Sesión -----------------------------------------------------------
-        self.menu_cerrar_sesion = QAction("Cerrar Sesión", self)
-        self.menu_cerrar_sesion.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/logout.svg")))
-        self.menu_cerrar_sesion.triggered.connect(self.close_session)
-
-        # Opción Ver Perfil -----------------------------------------------------------
-        self.menu_perfil_usuario = QAction("Ver Perfil", self)
-        self.menu_perfil_usuario.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/user.png")))
-
-        menuPerfilUsuario.addAction(self.menu_perfil_usuario)
-        menuPerfilUsuario.addAction(self.menu_cerrar_sesion)
-
-
-        menu_layout.addWidget(menu_bar)
-        menu_layout.addWidget(menu_bar_perfil)
-        menu_layout.setStretch(0, 1)
-
 
         # ----------------------------------------------------------------------
         # Agrega los widgets a la barra de título
@@ -307,7 +151,6 @@ class MyBar(QWidget):
 
         # Agrega el layout a la ventana y la barra de menús desplegables
         self.principal_layuot.addLayout(self.layout)
-        self.principal_layuot.addLayout(menu_layout)
 
         # Establece el layout principal
         self.setLayout(self.principal_layuot)
@@ -355,25 +198,6 @@ class MyBar(QWidget):
 
     def btn_min_clicked(self):
         self.parent.showMinimized()
-
-
-    # ----------------------------------------------------------------------
-    # FUNCIONES DE LA BARRA DE MENÚS DESPLEGABLES
-    def opcion_ver_perfil(self):
-        pass
-
-
-    def option_1_1(self):
-        print("Opción 1.1 seleccionada")
-
-    def option_1_2(self):
-        print("Opción 1.2 seleccionada")
-
-    def option_2_1(self):
-        print("Opción 2.1 seleccionada")
-
-    def option_2_2(self):
-        print("Opción 2.2 seleccionada")
 
     def close_session(self):
         self.parent.close()
@@ -445,10 +269,67 @@ class BookWidget(QWidget):
 
         return shadow
 
-
     def show_book_info(self, event):
         book_widget = BookInfoWidget(self.book_data)
         book_widget.exec()
+
+class BookGridVistaInicio(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        central_layout = QVBoxLayout()
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+
+        title = QLabel("LIBROS MÁS POPULARES")
+        title.setMaximumHeight(150)
+        title.setAlignment(Qt.AlignCenter)
+        title.setMinimumHeight(150)
+        title.setStyleSheet("font-size: 80px; font-weight: bold; color: black; border-radius: 20px; padding: 10px; margin: 10px; text-align: center;")
+
+        central_layout.addWidget(title)
+        # QScrollArea que contendrá el grid_layout
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)  # Ajusta el contenido al tamaño del área
+
+        # QWidget para alojar el grid_layout
+        scroll_content = QWidget(self)
+        scroll_content.setContentsMargins(20, 0, 20, 0)
+        scroll_area.setWidget(scroll_content)
+        scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        grid_layout = QGridLayout()
+        scroll_content.setLayout(grid_layout)
+
+        # Establece el espaciado entre elementos a 0
+        grid_layout.setSpacing(0)
+
+        num_columns = 4  # Define el número de columnas en el QGridLayout
+        row = 0  # Inicializa la fila en 0
+        max_books_to_show = 12  # Define el número máximo de libros a mostrar
+        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
+
+        # Lee los datos de libros desde el archivo libros.json
+        with open(path_to_json, "r", encoding="utf-8") as json_file:
+            books_data = json.load(json_file)
+
+        for i, book in enumerate(books_data[:max_books_to_show]):
+            # Crea un widget para el libro y pasa los datos del libro como argumento
+            book_widget = BookWidget(book)
+
+            # Calcula la fila y la columna actual en función del índice
+            row = i // num_columns
+            col = i % num_columns
+
+            # Agrega el widget del libro al QGridLayout en la fila y columna calculadas
+            grid_layout.addWidget(book_widget, row, col)
+
+        scroll_content.adjustSize()  # Ajusta el tamaño del contenido al tamaño del QScrollArea
+        # Agrega el QScrollArea al layout central
+        central_layout.addWidget(scroll_area)
+        self.setLayout(central_layout)
 
 class BookInfoWidget(QDialog):
     def __init__(self, book_data):
@@ -541,57 +422,6 @@ class BookInfoWidget(QDialog):
     def show_widget(self):
         self.show()
 
-class BookGridVistaInicio(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        central_layout = QVBoxLayout()
-        central_layout.setContentsMargins(0, 0, 0, 0)
-        central_layout.setSpacing(0)
-
-        # QScrollArea que contendrá el grid_layout
-        scroll_area = QScrollArea(self)
-        scroll_area.setWidgetResizable(True)  # Ajusta el contenido al tamaño del área
-
-        # QWidget para alojar el grid_layout
-        scroll_content = QWidget(self)
-        scroll_content.setContentsMargins(80, 0, 80, 0)
-        scroll_area.setWidget(scroll_content)
-        scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        grid_layout = QGridLayout()
-        scroll_content.setLayout(grid_layout)
-
-        # Establece el espaciado entre elementos a 0
-        grid_layout.setSpacing(0)
-
-        num_columns = 4  # Define el número de columnas en el QGridLayout
-        row = 0  # Inicializa la fila en 0
-        max_books_to_show = 12  # Define el número máximo de libros a mostrar
-        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
-
-        # Lee los datos de libros desde el archivo libros.json
-        with open(path_to_json, "r", encoding="utf-8") as json_file:
-            books_data = json.load(json_file)
-
-        for i, book in enumerate(books_data[:max_books_to_show]):
-            # Crea un widget para el libro y pasa los datos del libro como argumento
-            book_widget = BookWidget(book)
-
-            # Calcula la fila y la columna actual en función del índice
-            row = i // num_columns
-            col = i % num_columns
-
-            # Agrega el widget del libro al QGridLayout en la fila y columna calculadas
-            grid_layout.addWidget(book_widget, row, col)
-
-        scroll_content.adjustSize()  # Ajusta el tamaño del contenido al tamaño del QScrollArea
-        # Agrega el QScrollArea al layout central
-        central_layout.addWidget(scroll_area)
-        self.setLayout(central_layout)
-
 class ProfileImageWidget(QWidget):
     def __init__(self, user_data):
         super(ProfileImageWidget, self).__init__()
@@ -602,6 +432,11 @@ class ProfileImageWidget(QWidget):
         shadow.setBlurRadius(5)  # Ajusta según tus preferencias
         shadow.setColor(Qt.black)
         shadow.setOffset(0, 0)
+
+        shadow2 = QGraphicsDropShadowEffect(self)
+        shadow2.setBlurRadius(5)  # Ajusta según tus preferencias
+        shadow2.setColor(Qt.black)
+        shadow2.setOffset(0, 0)
 
         self.message = QMessageBox()
         self.message.setWindowTitle("Biblioteca SoftPro - Imagen de perfil")
@@ -673,7 +508,7 @@ class ProfileImageWidget(QWidget):
         self.save_image_button = QPushButton("Guardar Imagen")
         self.save_image_button.clicked.connect(self.save_profile_image)
         self.save_image_button.setMaximumHeight(30)
-        self.save_image_button.setGraphicsEffect(shadow)
+        self.save_image_button.setGraphicsEffect(shadow2)
         self.save_image_button.setCursor(Qt.PointingHandCursor)
         self.save_image_button.setStyleSheet(
             "QPushButton {"
@@ -782,13 +617,14 @@ class VistaUserProfile(QWidget):
         self.layout = QVBoxLayout()
 
         informacion_central = QWidget()
+        informacion_central.setStyleSheet("border-radius: 10px;")
         informacion_central.setContentsMargins(50, 0, 50, 0)
         informacion_central.setFixedHeight(360)
 
         informacion = QHBoxLayout()
-        informacion.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        informacion.setAlignment(Qt.AlignmentFlag.AlignTop)
         informacion.setContentsMargins(0, 0, 0, 0)
-        informacion.setSpacing(20)
+        informacion.setSpacing(50)
 
         # Agrega la imagen de perfil por ruta
         self.image_label = ProfileImageWidget(self.user_data)
@@ -814,21 +650,27 @@ class VistaUserProfile(QWidget):
         self.informacion_text.setSpacing(20)
 
         self.informacion_text.setAlignment(Qt.AlignmentFlag.AlignTop)
-
-        lb_bienvendia = QLabel(f"Hola {self.user_data['nombre']}!")
-        lb_bienvendia.setStyleSheet("font-size: 30px; font-weight: bold;")
+        lb_bienvendia = QLabel(f"👋 Hola {self.user_data['nombre']}!")
+        lb_bienvendia.setStyleSheet("font-size: 30px; font-weight: bold; color: black; background-color: #E4E4E4; border-radius: 20px; padding: 5px; margin-top: 15px;")
         user_rol = self.user_or_admin()
 
-        lb_info_user = QLabel(
-            f"Nombre: {self.user_data['nombre']}\n"
-            f"Identificación: {self.user_data['id_personal']}\n"
-            f"Celular: {self.user_data['cellphone']}\n"
-            f"Rol: {user_rol}\n"
-        )
-        lb_info_user.setStyleSheet("font-size: 20px;")
+
+        estilos_lb_info = "font-size: 20px; color: black; background-color: #E4E4E4; border-radius: 20px; padding: 10px;"
+        lb_info_user_name = QLabel(f"Nombre: {self.user_data['nombre']}")
+        lb_info_user_id_personal = QLabel(f"Identificación: {self.user_data['id_personal']}")
+        lb_info_user_cellphone = QLabel(f"Celular: {self.user_data['cellphone']}")
+        lb_info_user_role = QLabel(f"Rol: {user_rol}")
+
+        lb_info_user_name.setStyleSheet(estilos_lb_info)
+        lb_info_user_id_personal.setStyleSheet(estilos_lb_info)
+        lb_info_user_cellphone.setStyleSheet(estilos_lb_info)
+        lb_info_user_role.setStyleSheet(estilos_lb_info)
 
         self.informacion_text.addWidget(lb_bienvendia)
-        self.informacion_text.addWidget(lb_info_user)
+        self.informacion_text.addWidget(lb_info_user_name)
+        self.informacion_text.addWidget(lb_info_user_id_personal)
+        self.informacion_text.addWidget(lb_info_user_cellphone)
+        self.informacion_text.addWidget(lb_info_user_role)
 
         informacion_text_central.setLayout(self.informacion_text)
 
@@ -876,7 +718,39 @@ class VistaUserProfile(QWidget):
         else:
             return "Usuario"
 
+class Dashboard(QWidget):
+    def __init__(self, parent, user_data):
+        super(Dashboard, self).__init__()
+        self.parent = parent
+
+        self.side_menu = SideMenu(parent, user_data)
+        self.side_menu.button_close_session.clicked.connect(self.close_session)
+        self.stacked_widget = QStackedWidget()
+        self.setup_ui()
+
+    def setup_ui(self):
+        self.layout = QHBoxLayout()
+        # Agregar el menú lateral a la izquierda
+        self.layout.addWidget(self.side_menu)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)
+
+        # Agregar el contenido principal al resto del espacio
+        self.layout.addWidget(self.stacked_widget, 1)
+
+        self.setLayout(self.layout)
+
+    def close_session(self):
+        self.parent.close()
+        from ui_login.ui_login_copy import MiVentana
+        window = MiVentana()
+        window.show()
+
+class VistaGestionLibros(QWidget):
+    pass
+
 class Ui_principal(QMainWindow):
+    logout_signal = Signal()
     color_bar = "#2F53D1"
     def __init__(self, user_data=None):
         super().__init__()
@@ -941,6 +815,7 @@ class Ui_principal(QMainWindow):
 
     def interfaz(self):
         central_widget = QWidget()
+        central_widget.setStyleSheet("background-color: #2F53D1;")
         central_vbox = QVBoxLayout()
         central_widget.setContentsMargins(0, 0, 0, 0)
         central_vbox.setContentsMargins(0, 0, 0, 0)
@@ -964,32 +839,44 @@ class Ui_principal(QMainWindow):
         #self.create_menu_bar(navbars_layout)
         # ----------------------------------------------------------------
         navbars_widget.setLayout(navbars_layout)
-        navbars_widget.setMaximumHeight(75)
-        navbars_widget.setMinimumHeight(75)
+        navbars_widget.setMaximumHeight(50)
+        navbars_widget.setMinimumHeight(50)
 
         central_vbox.addWidget(navbars_widget)
 
-        self.vistas_app = QStackedWidget()
-        self.vistas_app.setStyleSheet("background-color: white;")
 
         # Vista de inicio de la biblioteca
-        principal_book_grid_widget = BookGridVistaInicio()
-        self.vistas_app.addWidget(principal_book_grid_widget)
-        navbar.button.clicked.connect(lambda: self.vistas_app.setCurrentWidget(principal_book_grid_widget))
+        self.principal_book_grid_widget = BookGridVistaInicio()
 
         # Vista de perfil de usuario
-        perfil_usuario = VistaUserProfile(self.user_data)
-        self.vistas_app.addWidget(perfil_usuario)
-        navbar.menu_perfil_usuario.triggered.connect(lambda: self.vistas_app.setCurrentWidget(perfil_usuario))
-        perfil_usuario.boton_prestamos.clicked.connect(lambda: self.vistas_app.setCurrentWidget(principal_book_grid_widget))
+        self.perfil_usuario = VistaUserProfile(self.user_data)
 
-        central_vbox.addWidget(self.vistas_app)
+        self.vista_administrador = Dashboard(self, self.user_data)
+        self.vista_administrador.setStyleSheet("background-color: white;")
+        self.vista_administrador.side_menu.button_home.clicked.connect(self.switch_principal)
+        self.vista_administrador.side_menu.button_perfil.clicked.connect(self.switch_perfil_usuario)
+        self.vista_administrador.side_menu.button_admin_libros.clicked.connect(lambda: print("Administrador Libros JAJA"))
+        #self.vista_administrador.side_menu.button_close_session.clicked.connect()
+        self.vista_administrador.stacked_widget.addWidget(self.principal_book_grid_widget)
+        self.vista_administrador.stacked_widget.addWidget(self.perfil_usuario)
+
+        central_vbox.addWidget(self.vista_administrador)
 
         self.setCentralWidget(central_widget)
         #print(self.user_data)
 
-    # def cambiar_vista(self, vista):
-    #     self.vistas_app.setCurrentIndex(vista)
+    def switch_principal(self):
+        self.vista_administrador.stacked_widget.setCurrentWidget(self.principal_book_grid_widget)
+        self.vista_administrador.setStyleSheet("background-color: white;")
+
+    def switch_perfil_usuario(self):
+        self.vista_administrador.stacked_widget.setCurrentWidget(self.perfil_usuario)
+        self.vista_administrador.setStyleSheet("background-color: white;")
+
+    def switch_vista_administrador(self):
+        self.vistas_app.setCurrentWidget(self.vista_administrador)
+        self.vistas_app.setStyleSheet("background-color: #1C3D95;")
+
 
 
 def main():
