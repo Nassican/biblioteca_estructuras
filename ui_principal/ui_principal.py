@@ -815,7 +815,7 @@ class VistaUserProfile(QWidget):
 
         self.informacion_text.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        lb_bienvendia = QLabel(f"Bienvenido, {self.user_data['nombre']}!")
+        lb_bienvendia = QLabel(f"Hola {self.user_data['nombre']}!")
         lb_bienvendia.setStyleSheet("font-size: 30px; font-weight: bold;")
         user_rol = self.user_or_admin()
 
@@ -839,16 +839,29 @@ class VistaUserProfile(QWidget):
         self.layout_buttom.setContentsMargins(0, 0, 0, 0)
         self.layout_buttom.setSpacing(50)
 
-        self.boton_prestamos = QPushButton("Prestamos")
+        self.boton_prestamos = QPushButton("Ver mis prestamos")
         self.boton_prestamos.setMaximumWidth(200)
+        self.boton_prestamos.setCursor(Qt.PointingHandCursor)
         self.layout_buttom.addWidget(self.boton_prestamos)
 
+        self.boton_cambiar_contraseña = QPushButton("Cambiar Contraseña")
+        self.boton_cambiar_contraseña.setMaximumWidth(200)
+        self.boton_cambiar_contraseña.setCursor(Qt.PointingHandCursor)
+        self.layout_buttom.addWidget(self.boton_cambiar_contraseña)
+
         self.boton_eliminar_cuenta = QPushButton("Eliminar Cuenta")
+        self.boton_eliminar_cuenta.setCursor(Qt.PointingHandCursor)
         self.boton_eliminar_cuenta.setMaximumWidth(200)
         self.boton_eliminar_cuenta.setStyleSheet(
             "QPushButton {"
             "background-color: #FF0000; "
             "color: white; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #CC0000; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #800000"
             "}"
         )
         self.layout_buttom.addWidget(self.boton_eliminar_cuenta)
