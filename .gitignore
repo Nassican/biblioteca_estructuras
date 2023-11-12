@@ -1,3 +1,4 @@
 
 *.pyc
 ui_login/__pycache__/ui_login_copy.cpython-311.pyc
+*.pyc

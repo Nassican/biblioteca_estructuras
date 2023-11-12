@@ -170,11 +170,40 @@ class Login(QWidget):
 
         self.button_login = QPushButton("Iniciar sesión")
         self.button_login.setCursor(Qt.PointingHandCursor)
+        self.button_login.clicked.connect(self.loguearse_button_clicked)
 
         self.label_register = QLabel("¿No tienes cuenta?")
         self.label_register_button = QPushButton("Regístrate")
         self.label_register_button.setCursor(Qt.PointingHandCursor)
 
+        self.message = QMessageBox()
+        self.button_message = QPushButton("Aceptar")
+        self.button_message.setCursor(Qt.PointingHandCursor)
+        self.message.addButton(self.button_message, QMessageBox.AcceptRole)
+        self.message.setIcon(QMessageBox.Critical)
+        self.message.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/libro.png")))
+        self.message.setStyleSheet(
+            "QMessageBox{ "
+            "border: 10px;"
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
         # Agregar los widgets al layout
         separacion = 50
         layout = QVBoxLayout(self)
@@ -232,6 +261,35 @@ class Login(QWidget):
         else:
             self.show_password_button.setIcon(QIcon(os.path.join(basedir, "../media/img/eye-open.png")))
             self.line_edit_password.setEchoMode(QLineEdit.Password)
+
+    def loguearse_button_clicked(self):
+        username = self.line_edit_user.text()
+        password = self.line_edit_password.text()
+
+        if username == "" or password == "":
+            self.message.setWindowTitle("Biblioteca SoftPro - Error")
+            self.message.setText("Usuario o contraseña incompletos.")
+            self.message.exec()
+            return
+
+        authenticated = backend.verificar_credenciales(username, password)
+
+        if authenticated:
+            print("Autenticado correctamente.")
+            print(f"¡Bienvenido, {authenticated['nombre']}!")
+            ventana = Ui_principal(authenticated)
+            self.close()
+            ventana.show()
+
+            if authenticated['rol'] == 'admin':
+                print("Eres un administrador.")
+            else:
+                print("Eres un usuario estándar.")
+        else:
+            # Mostrar un mensaje de error en caso de autenticación fallida.
+            self.message.setWindowTitle("Biblioteca SoftPro - Error")
+            self.message.setText("Usuario o contraseña incorrectos.")
+            self.message.exec()
 
 class Register(QWidget):
     def __init__(self):
@@ -552,7 +610,7 @@ class Register(QWidget):
                 "id_personal": int(ident),
                 "username": username,
                 "nombre": names,
-                "celular": cellphone_number,
+                "cellphone": cellphone_number,
                 "password": password,
                 "rol": "usuario"
             }
@@ -632,8 +690,6 @@ class MiVentana(QWidget):
         self.label_register_button = self.login_widget.label_register_button
         self.label_register_button.clicked.connect(self.on_register_button_clicked)
 
-        self.login_widget.button_login.clicked.connect(self.loguearse_button_clicked)
-
         self.label_login_button = self.register_widget.label_login_button
         self.label_login_button.clicked.connect(self.on_login_button_clicked)
 
@@ -652,26 +708,6 @@ class MiVentana(QWidget):
     def on_register_button_clicked(self):
         self.stacked_widget.setCurrentWidget(self.register_widget)
 
-    def loguearse_button_clicked(self):
-        username = self.login_widget.line_edit_user.text()
-        password = self.login_widget.line_edit_password.text()
-
-        authenticated = backend.verificar_credenciales(username, password)
-
-        if authenticated:
-            print("Autenticado correctamente.")
-            print(f"¡Bienvenido, {authenticated['nombre']}!")
-            ventana = Ui_principal(authenticated)
-            self.close()
-            ventana.show()
-
-            if authenticated['rol'] == 'admin':
-                print("Eres un administrador.")
-            else:
-                print("Eres un usuario estándar.")
-        else:
-            # Mostrar un mensaje de error en caso de autenticación fallida.
-            QMessageBox.warning(self, 'Error de autenticación', 'Credenciales incorrectas. Por favor, inténtelo de nuevo.')
 
 def main():
     app = QApplication(sys.argv)

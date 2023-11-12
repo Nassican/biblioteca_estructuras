@@ -46,7 +46,7 @@ def register_user_in_database(new_user):
     usuarios = cargar_base_de_datos()
     usuarios.append(new_user)
     actualizar_base_de_datos(usuarios)
-    
+
 def obtener_json(api_url):
     try:
       response = requests.get(api_url)

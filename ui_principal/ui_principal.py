@@ -2,6 +2,7 @@ import sys
 import json
 import os
 import requests
+import shutil
 
 from PySide6.QtWidgets import (
     QApplication,
@@ -18,7 +19,10 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QScrollArea,
     QDialog,
-    QGraphicsDropShadowEffect
+    QGraphicsDropShadowEffect,
+    QSizeGrip,
+    QStackedWidget,
+    QFileDialog,
 )
 from PySide6.QtGui import *
 from PySide6.QtCore import Qt, QThread, Signal, QPoint
@@ -84,8 +88,8 @@ class MyBar(QWidget):
         bar_layout.setContentsMargins(0, 0, 0, 0)
 
         # Botón a la izquierda
-        button = QPushButton("Biblioteca Softpro")
-        button.setStyleSheet(
+        self.button = QPushButton("Biblioteca Softpro")
+        self.button.setStyleSheet(
             "QPushButton {"
             "background-color: transparent; "
             "color: white; "
@@ -97,7 +101,7 @@ class MyBar(QWidget):
             "border-radius: 20px;"
             "}"
         )
-        button.setCursor(Qt.PointingHandCursor)
+        self.button.setCursor(Qt.PointingHandCursor)
 
         # Barra de búsqueda en el centro
         search_container = QWidget()
@@ -120,7 +124,7 @@ class MyBar(QWidget):
         search_button.setFixedSize(30, 30)
 
         # Configura la alineación del botón y search_container en bar_layout
-        bar_layout.addWidget(button, alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        bar_layout.addWidget(self.button, alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         bar_layout.addWidget(search_container, alignment=Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter)
         bar_layout.setContentsMargins(0, 2, 0, 0)
 
@@ -161,10 +165,21 @@ class MyBar(QWidget):
             "QMenu { "
             "background-color: #2F53D1;"
             "color: white;"
-            "font-size: 14px;"
+            "font-size: 15px;"
+            "padding: 0px;"
+            "margin: 0px;"
+            "text-align: center;"
             "}"
             "QMenu::item:selected { "
             "background-color: #1C3D95; "
+            "}"
+            "QMenu::item {"
+            "font-size: 15px;"
+            "padding: 5px;"
+            "padding-right: 10px;"
+            "}"
+            "QMenu::icon {"
+            "padding-left: 10px;"
             "}"
             )
         menu1.setCursor(Qt.PointingHandCursor)
@@ -189,10 +204,21 @@ class MyBar(QWidget):
             "QMenu { "
             "background-color: #2F53D1;"
             "color: white;"
-            "font-size: 14px;"
+            "font-size: 15px;"
+            "padding: 0px;"
+            "margin: 0px;"
+            "text-align: center;"
             "}"
             "QMenu::item:selected { "
             "background-color: #1C3D95; "
+            "}"
+            "QMenu::item {"
+            "font-size: 15px;"
+            "padding: 5px;"
+            "padding-right: 10px;"
+            "}"
+            "QMenu::icon {"
+            "padding-left: 10px;"
             "}"
         )
         # Opción 2.1
@@ -233,7 +259,7 @@ class MyBar(QWidget):
             "QMenu { "
             "background-color: #2F53D1;"
             "color: white;"
-            "font-size: 14px;"
+            "font-size: 15px;"
             "padding: 0px;"
             "margin: 0px;"
             "text-align: center;"
@@ -242,7 +268,6 @@ class MyBar(QWidget):
             "background-color: #1C3D95; "
             "}"
             "QMenu::item {"
-            "font-weight: bold;"
             "font-size: 15px;"
             "padding: 5px;"
             "padding-left: 40px;"
@@ -253,23 +278,19 @@ class MyBar(QWidget):
             "}"
             )
 
-
         menu_bar_perfil.addMenu(menuPerfilUsuario)
 
-        # Opción Ver Perfil -----------------------------------------------------------
-
-
         # Opción Cerrar Sesión -----------------------------------------------------------
-        menu_cerrar_sesion = QAction("Cerrar Sesión", self)
-        menu_cerrar_sesion.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/logout.svg")))
-        menu_cerrar_sesion.triggered.connect(self.close_session)
+        self.menu_cerrar_sesion = QAction("Cerrar Sesión", self)
+        self.menu_cerrar_sesion.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/logout.svg")))
+        self.menu_cerrar_sesion.triggered.connect(self.close_session)
 
-        menu_perfil_usuario = QAction("Ver Perfil", self)
-        menu_perfil_usuario.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/user.png")))
-        menu_perfil_usuario.triggered.connect(self.option_1_1)
+        # Opción Ver Perfil -----------------------------------------------------------
+        self.menu_perfil_usuario = QAction("Ver Perfil", self)
+        self.menu_perfil_usuario.setIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/user.png")))
 
-        menuPerfilUsuario.addAction(menu_perfil_usuario)
-        menuPerfilUsuario.addAction(menu_cerrar_sesion)
+        menuPerfilUsuario.addAction(self.menu_perfil_usuario)
+        menuPerfilUsuario.addAction(self.menu_cerrar_sesion)
 
 
         menu_layout.addWidget(menu_bar)
@@ -335,15 +356,13 @@ class MyBar(QWidget):
     def btn_min_clicked(self):
         self.parent.showMinimized()
 
-    def mostrar_menu(self):
-        # Obtener la posición del botón de menú
-        pos = self.menu_bar.mapToGlobal(self.boton_menu.geometry().bottomLeft())
-
-        # Configurar la posición del menú
-        self.menu.exec_(pos)
 
     # ----------------------------------------------------------------------
     # FUNCIONES DE LA BARRA DE MENÚS DESPLEGABLES
+    def opcion_ver_perfil(self):
+        pass
+
+
     def option_1_1(self):
         print("Opción 1.1 seleccionada")
 
@@ -361,7 +380,6 @@ class MyBar(QWidget):
         from ui_login.ui_login_copy import MiVentana
         window = MiVentana()
         window.show()
-
 
 class ImageLoader(QThread):
     image_loaded = Signal(bytes)  # Señal para comunicar la imagen cargada
@@ -523,7 +541,327 @@ class BookInfoWidget(QDialog):
     def show_widget(self):
         self.show()
 
+class BookGridVistaInicio(QWidget):
+    def __init__(self):
+        super().__init__()
 
+        central_layout = QVBoxLayout()
+        central_layout.setContentsMargins(0, 0, 0, 0)
+        central_layout.setSpacing(0)
+
+        # QScrollArea que contendrá el grid_layout
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)  # Ajusta el contenido al tamaño del área
+
+        # QWidget para alojar el grid_layout
+        scroll_content = QWidget(self)
+        scroll_content.setContentsMargins(80, 0, 80, 0)
+        scroll_area.setWidget(scroll_content)
+        scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        grid_layout = QGridLayout()
+        scroll_content.setLayout(grid_layout)
+
+        # Establece el espaciado entre elementos a 0
+        grid_layout.setSpacing(0)
+
+        num_columns = 4  # Define el número de columnas en el QGridLayout
+        row = 0  # Inicializa la fila en 0
+        max_books_to_show = 12  # Define el número máximo de libros a mostrar
+        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
+
+        # Lee los datos de libros desde el archivo libros.json
+        with open(path_to_json, "r", encoding="utf-8") as json_file:
+            books_data = json.load(json_file)
+
+        for i, book in enumerate(books_data[:max_books_to_show]):
+            # Crea un widget para el libro y pasa los datos del libro como argumento
+            book_widget = BookWidget(book)
+
+            # Calcula la fila y la columna actual en función del índice
+            row = i // num_columns
+            col = i % num_columns
+
+            # Agrega el widget del libro al QGridLayout en la fila y columna calculadas
+            grid_layout.addWidget(book_widget, row, col)
+
+        scroll_content.adjustSize()  # Ajusta el tamaño del contenido al tamaño del QScrollArea
+        # Agrega el QScrollArea al layout central
+        central_layout.addWidget(scroll_area)
+        self.setLayout(central_layout)
+
+class ProfileImageWidget(QWidget):
+    def __init__(self, user_data):
+        super(ProfileImageWidget, self).__init__()
+        self.user_data = user_data
+        self.profile_image_path = None
+
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(5)  # Ajusta según tus preferencias
+        shadow.setColor(Qt.black)
+        shadow.setOffset(0, 0)
+
+        self.message = QMessageBox()
+        self.message.setWindowTitle("Biblioteca SoftPro - Imagen de perfil")
+        self.button_message = QPushButton("Aceptar")
+        self.button_message.setCursor(Qt.PointingHandCursor)
+        self.message.addButton(self.button_message, QMessageBox.AcceptRole)
+        self.message.setIcon(QMessageBox.Critical)
+        self.message.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/libro.png")))
+        self.message.setStyleSheet(
+            "QMessageBox{ "
+            "border: 10px;"
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+
+        # Interfaz de usuario
+        self.layout = QVBoxLayout()
+
+        self.image_label = QLabel("No hay imagen de perfil")
+        self.image_label.setAlignment(Qt.AlignCenter)
+        self.image_label.setStyleSheet(
+            "QLabel {"
+            "border: 2px solid #DDDDDD;"
+            "}"
+        )
+        self.layout.addWidget(self.image_label)
+
+        self.select_image_button = QPushButton("Seleccionar Imagen")
+        self.select_image_button.clicked.connect(self.select_image)
+        self.select_image_button.setMaximumHeight(30)
+        self.select_image_button.setGraphicsEffect(shadow)
+        self.select_image_button.setCursor(Qt.PointingHandCursor)
+        self.select_image_button.setStyleSheet(
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 16px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+        self.layout.addWidget(self.select_image_button)
+
+        self.save_image_button = QPushButton("Guardar Imagen")
+        self.save_image_button.clicked.connect(self.save_profile_image)
+        self.save_image_button.setMaximumHeight(30)
+        self.save_image_button.setGraphicsEffect(shadow)
+        self.save_image_button.setCursor(Qt.PointingHandCursor)
+        self.save_image_button.setStyleSheet(
+            "QPushButton {"
+            "background-color: #27E01B; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 16px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1DAE13; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #6BD864"
+            "}"
+        )
+        self.layout.addWidget(self.save_image_button)
+
+        self.load_saved_image()
+        self.setLayout(self.layout)
+
+    def select_image(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        file_dialog.setNameFilter("Images (*.png *.jpg *.bmp)")
+        file_dialog.setViewMode(QFileDialog.ViewMode.Detail)
+
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                self.profile_image_path = selected_files[0]
+                self.load_and_display_image()
+
+    def save_profile_image(self):
+        if self.profile_image_path:
+            user_uuid = self.user_data["uuid"]
+            base_path = os.path.join(os.path.dirname(__file__), "../media/usuarios")
+            user_media_path = os.path.join(base_path, user_uuid)
+
+            if not os.path.exists(user_media_path):
+                os.makedirs(user_media_path)
+
+            destination_path = os.path.join(user_media_path, "perfil.png")
+
+            try:
+                # Copia la imagen seleccionada al destino
+                shutil.copy2(self.profile_image_path, destination_path)
+
+                self.message.setText("Imagen de perfil guardada correctamente.")
+                self.message.setIcon(QMessageBox.Information)
+                self.message.exec()
+
+                print(f"Imagen de perfil guardada en: {destination_path}")
+                self.load_and_display_image()
+            except Exception as e:
+                print(f"Error al guardar la imagen de perfil: {str(e)}")
+        else:
+            print("Por favor, seleccione una imagen de perfil antes de guardar.")
+
+    def load_saved_image(self):
+        user_uuid = self.user_data["uuid"]
+        path = os.path.join(os.path.dirname(__file__), "../media/usuarios", user_uuid, "perfil.png")
+        if os.path.exists(path):
+            self.profile_image_path = path
+            self.load_and_display_image()
+
+    def load_and_display_image(self):
+        if os.path.exists(self.profile_image_path):
+            pixmap = QPixmap(self.profile_image_path)
+            scaled_pixmap = pixmap.scaled(self.image_label.size(),Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+            self.image_label.setPixmap(scaled_pixmap)
+            self.image_label.setAlignment(Qt.AlignCenter)
+            self.image_label.setScaledContents(True)  # Hace que la imagen se adapte al tamaño de la QLabel
+        else:
+            print("La ruta de la imagen no es válida o la imagen no existe.")
+
+class VistaUserProfile(QWidget):
+    def __init__(self, user_data):
+        super(VistaUserProfile, self).__init__()
+        self.user_data = user_data
+        self.setContentsMargins(100, 0, 100, 0)
+        # Agrega widgets y elementos de interfaz gráfica según sea necesario
+        self.setStyleSheet(
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 16px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+        self.layout = QVBoxLayout()
+
+        informacion_central = QWidget()
+        informacion_central.setContentsMargins(50, 0, 50, 0)
+        informacion_central.setFixedHeight(360)
+
+        informacion = QHBoxLayout()
+        informacion.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
+        informacion.setContentsMargins(0, 0, 0, 0)
+        informacion.setSpacing(20)
+
+        # Agrega la imagen de perfil por ruta
+        self.image_label = ProfileImageWidget(self.user_data)
+        informacion.addWidget(self.image_label)
+        self.image_label.setStyleSheet(
+            "QLabel {"
+            "   background-color: white;"
+            "   border-radius: 10px;"
+            "   padding: 10px;"
+            "}"
+        )
+        self.image_label.setMaximumWidth(300)
+        self.image_label.setMinimumWidth(300)
+        self.image_label.setMinimumHeight(360)
+        self.image_label.setMaximumHeight(360)
+
+        informacion_text_central = QWidget()
+        informacion_text_central.setContentsMargins(0, 0, 0, 0)
+        informacion_text_central.setStyleSheet("border-radius: 10px;")
+
+        self.informacion_text = QVBoxLayout()
+        self.informacion_text.setContentsMargins(0, 0, 0, 0)
+        self.informacion_text.setSpacing(20)
+
+        self.informacion_text.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        lb_bienvendia = QLabel(f"Bienvenido, {self.user_data['nombre']}!")
+        lb_bienvendia.setStyleSheet("font-size: 30px; font-weight: bold;")
+        user_rol = self.user_or_admin()
+
+        lb_info_user = QLabel(
+            f"Nombre: {self.user_data['nombre']}\n"
+            f"Identificación: {self.user_data['id_personal']}\n"
+            f"Celular: {self.user_data['cellphone']}\n"
+            f"Rol: {user_rol}\n"
+        )
+        lb_info_user.setStyleSheet("font-size: 20px;")
+
+        self.informacion_text.addWidget(lb_bienvendia)
+        self.informacion_text.addWidget(lb_info_user)
+
+        informacion_text_central.setLayout(self.informacion_text)
+
+        informacion.addWidget(informacion_text_central)
+        informacion_central.setLayout(informacion)
+
+        self.layout_buttom = QHBoxLayout()
+        self.layout_buttom.setContentsMargins(0, 0, 0, 0)
+        self.layout_buttom.setSpacing(50)
+
+        self.boton_prestamos = QPushButton("Prestamos")
+        self.boton_prestamos.setMaximumWidth(200)
+        self.layout_buttom.addWidget(self.boton_prestamos)
+
+        self.boton_eliminar_cuenta = QPushButton("Eliminar Cuenta")
+        self.boton_eliminar_cuenta.setMaximumWidth(200)
+        self.boton_eliminar_cuenta.setStyleSheet(
+            "QPushButton {"
+            "background-color: #FF0000; "
+            "color: white; "
+            "}"
+        )
+        self.layout_buttom.addWidget(self.boton_eliminar_cuenta)
+
+        self.layout.addWidget(informacion_central)
+        self.layout.addLayout(self.layout_buttom)
+        self.setLayout(self.layout)
+
+    def user_or_admin(self):
+        if self.user_data['rol'] == "admin":
+            return "Administrador"
+        else:
+            return "Usuario"
 
 class Ui_principal(QMainWindow):
     color_bar = "#2F53D1"
@@ -571,59 +909,22 @@ class Ui_principal(QMainWindow):
 
         self.setWindowTitle("Bienvenido a Biblioteca Softpro")
         self.setGeometry(50, 50, 1280, 720)
-        self.setMinimumSize(1280, 720)
+        self.setMinimumSize(1200, 600)
         path_icon = os.path.join(os.path.dirname(__file__), "../media/img/libro.png")
         icon = QIcon(path_icon)
         self.setWindowIcon(icon)
         self.setWindowFlags(Qt.FramelessWindowHint)
-
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.size_grip = QSizeGrip(self)
+        self.size_grip.setStyleSheet("QSizeGrip { background-color: transparent; }")
+        self.size_grip.setFixedSize(20, 20)
+        self.size_grip.setGeometry(self.width() - 20, self.height() - 20, 20, 20)
 
         # Barra horizontal con botón y barra de búsqueda
-
-
-    def fill_grid_layout(self, widget):
-        #QScrollArea que contendrá el grid_layout
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)  # Ajusta el contenido al tamaño del área
-        widget.addWidget(scroll_area)
-
-        #QWidget para alojar el grid_layout
-        scroll_content = QWidget()
-        scroll_content.setContentsMargins(80, 0, 80, 0)
-        scroll_area.setWidget(scroll_content)
-        scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        #QGridLayout
-        grid_layout = QGridLayout()
-        scroll_content.setLayout(grid_layout)
-
-        # Establece el espaciado entre elementos a 0
-        grid_layout.setSpacing(0)
-
-        num_columns = 4  # Define el número de columnas en el QGridLayout
-        row = 0  # Inicializa la fila en 0
-        max_books_to_show = 12  # Define el número máximo de libros a mostrar
-        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
-
-        # Lee los datos de libros desde el archivo libros.json
-        with open(path_to_json, "r", encoding="utf-8") as json_file:
-            books_data = json.load(json_file)
-
-        for i, book in enumerate(books_data[:max_books_to_show]):
-            # Crea un widget para el libro y pasa los datos del libro como argumento
-            book_widget = BookWidget(book)
-
-            # Calcula la fila y la columna actual en función del índice
-            row = i // num_columns
-            col = i % num_columns
-
-            # Agrega el widget del libro al QGridLayout en la fila y columna calculadas
-            grid_layout.addWidget(book_widget, row, col)
-
-        # Agrega el QGridLayout al QWidget
-        scroll_content.adjustSize()
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        super(Ui_principal, self).resizeEvent(event)
+        self.size_grip.setGeometry(self.width() - 20, self.height() - 20, 20, 20)
 
     def interfaz(self):
         central_widget = QWidget()
@@ -654,9 +955,28 @@ class Ui_principal(QMainWindow):
         navbars_widget.setMinimumHeight(75)
 
         central_vbox.addWidget(navbars_widget)
-        self.fill_grid_layout(central_vbox)
+
+        self.vistas_app = QStackedWidget()
+        self.vistas_app.setStyleSheet("background-color: white;")
+
+        # Vista de inicio de la biblioteca
+        principal_book_grid_widget = BookGridVistaInicio()
+        self.vistas_app.addWidget(principal_book_grid_widget)
+        navbar.button.clicked.connect(lambda: self.vistas_app.setCurrentWidget(principal_book_grid_widget))
+
+        # Vista de perfil de usuario
+        perfil_usuario = VistaUserProfile(self.user_data)
+        self.vistas_app.addWidget(perfil_usuario)
+        navbar.menu_perfil_usuario.triggered.connect(lambda: self.vistas_app.setCurrentWidget(perfil_usuario))
+        perfil_usuario.boton_prestamos.clicked.connect(lambda: self.vistas_app.setCurrentWidget(principal_book_grid_widget))
+
+        central_vbox.addWidget(self.vistas_app)
+
         self.setCentralWidget(central_widget)
         #print(self.user_data)
+
+    # def cambiar_vista(self, vista):
+    #     self.vistas_app.setCurrentIndex(vista)
 
 
 def main():
