@@ -224,6 +224,7 @@ class BookWidget(QWidget):
         super().__init__()
 
         self.image_label = QLabel()
+        self.image_label.setFixedSize(200, 300)
         image_url = book_data.get("imagen_url", "")
         self.image_loader = ImageLoader(image_url)
 
@@ -276,25 +277,22 @@ class BookWidget(QWidget):
 class BookGridVistaInicio(QWidget):
     def __init__(self):
         super().__init__()
-
         central_layout = QVBoxLayout()
+        central_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
         central_layout.setContentsMargins(0, 0, 0, 0)
         central_layout.setSpacing(0)
 
         title = QLabel("LIBROS MÁS POPULARES")
-        title.setMaximumHeight(150)
         title.setAlignment(Qt.AlignCenter)
-        title.setMinimumHeight(150)
-        title.setStyleSheet("font-size: 80px; font-weight: bold; color: black; border-radius: 20px; padding: 10px; margin: 10px; text-align: center;")
+        title.setStyleSheet("font-size: 40px; font-weight: bold; color: black; padding: 5px; text-align: center;")
 
-        central_layout.addWidget(title)
         # QScrollArea que contendrá el grid_layout
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)  # Ajusta el contenido al tamaño del área
 
         # QWidget para alojar el grid_layout
         scroll_content = QWidget(self)
-        scroll_content.setContentsMargins(20, 0, 20, 0)
+        scroll_content.setContentsMargins(0, 0, 0, 0)
         scroll_area.setWidget(scroll_content)
         scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
@@ -307,24 +305,29 @@ class BookGridVistaInicio(QWidget):
         grid_layout.setSpacing(0)
 
         num_columns = 4  # Define el número de columnas en el QGridLayout
-        row = 0  # Inicializa la fila en 0
-        max_books_to_show = 12  # Define el número máximo de libros a mostrar
+        max_books_to_show = 4  # Define el número máximo de libros a mostrar
         path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
 
         # Lee los datos de libros desde el archivo libros.json
         with open(path_to_json, "r", encoding="utf-8") as json_file:
             books_data = json.load(json_file)
 
+        grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
+
+        grid_layout.addWidget(title, 0, 0, 1, num_columns)
+        row = 1
         for i, book in enumerate(books_data[:max_books_to_show]):
             # Crea un widget para el libro y pasa los datos del libro como argumento
             book_widget = BookWidget(book)
 
             # Calcula la fila y la columna actual en función del índice
-            row = i // num_columns
             col = i % num_columns
 
             # Agrega el widget del libro al QGridLayout en la fila y columna calculadas
             grid_layout.addWidget(book_widget, row, col)
+
+            if col == num_columns - 1:
+                row += 1
 
         scroll_content.adjustSize()  # Ajusta el tamaño del contenido al tamaño del QScrollArea
         # Agrega el QScrollArea al layout central
