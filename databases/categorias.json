@@ -1,0 +1,37 @@
+{
+  "categorias_libros": [
+    {
+      "categoria": "Ficción"
+    },
+    {
+      "categoria": "Ciencia Ficción"
+    },
+    {
+      "categoria": "No Ficción"
+    },
+    {
+      "categoria": "Misterio"
+    },
+    {
+      "categoria": "Histórico"
+    },
+    {
+      "categoria": "Biografía"
+    },
+    {
+      "categoria": "Fantasía"
+    },
+    {
+      "categoria": "Romance"
+    },
+    {
+      "categoria": "Aventura"
+    },
+    {
+      "categoria": "Humor"
+    },
+    {
+      "categoria": "Realismo"
+    }
+  ]
+}

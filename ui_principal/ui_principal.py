@@ -515,7 +515,7 @@ class ProfileImageWidget(QWidget):
         self.save_image_button.setCursor(Qt.PointingHandCursor)
         self.save_image_button.setStyleSheet(
             "QPushButton {"
-            "background-color: #27E01B; "
+            "background-color: #067A14;"
             "color: white; "
             "border-radius: 10px; "
             "padding: 5px; "
@@ -593,10 +593,75 @@ class ProfileImageWidget(QWidget):
         else:
             print("La ruta de la imagen no es válida o la imagen no existe.")
 
+# Se puede usar como plantilla para confirmaciones
+class ConfirmDeleteDialog(QDialog):
+    def __init__(self, parent=None):
+        super(ConfirmDeleteDialog, self).__init__(parent)
+        self.setFixedWidth(400)
+        self.setWindowTitle("Confirmar Eliminación de Cuenta")
+        self.setStyleSheet(
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 16px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+            "QLabel {"
+            "font-size: 20px;"
+            "margin-bottom: 20px;"
+            "}"
+        )
+
+        layout = QVBoxLayout()
+
+        label = QLabel("¿Está seguro de que desea eliminar su cuenta? Esta accion es irreversible.")
+        label.setWordWrap(True)
+        layout.addWidget(label)
+
+        confirm_button = QPushButton("Eliminar Cuenta")
+        confirm_button.clicked.connect(self.accept)
+        confirm_button.setCursor(Qt.PointingHandCursor)
+        confirm_button.setStyleSheet(
+            "QPushButton {"
+            "background-color: #FF0000; "
+            "color: white; "
+            "text-align: center;"
+            "}"
+            "QPushButton::hover {"
+            "background-color: #CC0000; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #800000"
+            "}"
+        )
+
+        cancel_button = QPushButton("Cancelar")
+        cancel_button.setCursor(Qt.PointingHandCursor)
+        cancel_button.clicked.connect(self.reject)
+
+        layout_buttons = QHBoxLayout()
+        layout_buttons.addWidget(confirm_button)
+        layout_buttons.addWidget(cancel_button)
+
+        layout.addLayout(layout_buttons)
+
+        self.setLayout(layout)
+
 class VistaUserProfile(QWidget):
-    def __init__(self, user_data):
+    def __init__(self, parent, user_data):
         super(VistaUserProfile, self).__init__()
         self.user_data = user_data
+        self.parent = parent
         self.setContentsMargins(100, 0, 100, 0)
         # Agrega widgets y elementos de interfaz gráfica según sea necesario
         self.setStyleSheet(
@@ -701,6 +766,7 @@ class VistaUserProfile(QWidget):
             "QPushButton {"
             "background-color: #FF0000; "
             "color: white; "
+            "text-align: center;"
             "}"
             "QPushButton::hover {"
             "background-color: #CC0000; "
@@ -710,6 +776,7 @@ class VistaUserProfile(QWidget):
             "}"
         )
         self.layout_buttom.addWidget(self.boton_eliminar_cuenta)
+        self.boton_eliminar_cuenta.clicked.connect(self.confirm_delete_account)
 
         self.layout.addWidget(informacion_central)
         self.layout.addLayout(self.layout_buttom)
@@ -720,6 +787,41 @@ class VistaUserProfile(QWidget):
             return "Administrador"
         else:
             return "Usuario"
+
+    def confirm_delete_account(self):
+        # Muestra el cuadro de diálogo de confirmación
+        confirm_dialog = ConfirmDeleteDialog(self)
+        result = confirm_dialog.exec()
+
+        # Si el usuario confirma, realiza la acción de eliminación
+        if result == QDialog.Accepted:
+            self.close_and_eliminate_session()
+
+    def close_and_eliminate_session(self):
+        #index_eliminar = self.user_data["uuid"]
+        uuid_user = self.user_data["uuid"]
+        if uuid_user:
+            path_to_json = os.path.join(os.path.dirname(__file__), "../databases/usuarios.json")
+
+            with open(path_to_json, "r", encoding="utf-8") as json_file:
+                all_users_data = json.load(json_file)
+            # Encuentra el índice del usuario por su UUID
+            index_eliminar = next(
+                (index for (index, user) in enumerate(all_users_data["usuarios"]) if user["uuid"] == uuid_user),
+                None
+            )
+            # Verifica si el usuario existe en la lista antes de intentar eliminarlo
+            if index_eliminar is not None:
+                # Elimina al usuario por su UUID
+                del all_users_data["usuarios"][index_eliminar]
+                # Guarda la lista actualizada en el archivo JSON
+                with open(path_to_json, "w", encoding="utf-8") as json_file:
+                    json.dump(all_users_data, json_file, indent=2)
+
+        self.parent.close()
+        from ui_login.ui_login_copy import MiVentana
+        window = MiVentana()
+        window.show()
 
 class Dashboard(QWidget):
     def __init__(self, parent, user_data):
@@ -852,7 +954,7 @@ class Ui_principal(QMainWindow):
         self.principal_book_grid_widget = BookGridVistaInicio()
 
         # Vista de perfil de usuario
-        self.perfil_usuario = VistaUserProfile(self.user_data)
+        self.perfil_usuario = VistaUserProfile(self, self.user_data)
 
         self.vista_administrador = Dashboard(self, self.user_data)
         self.vista_administrador.setStyleSheet("background-color: white;")
