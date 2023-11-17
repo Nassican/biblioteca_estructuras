@@ -1,59 +1,59 @@
 {
   "Libros": [
-      {
-          "Titulo": "Cien años de soledad",
-          "Autor": "Gabriel García Márquez",
-          "Editorial": "Sudamericana",
-          "ISBN": "978-84-376-0494-7",
-          "Año de publicacion": 1967,
-          "Idioma": "Español",
-          "Ejemplares": 10,
-          "Categoria": "Realismo mágico",
-          "Sinopsis": "Cien años de soledad es una novela del escritor colombiano Gabriel García Márquez, ganadora del Premio Nobel de Literatura en 1982. La obra narra la historia de la familia Buendía a lo largo de siete generaciones en el ficticio pueblo de Macondo."
-      },
-      {
-          "Titulo": "1984",
-          "Autor": "George Orwell",
-          "Editorial": "Secker & Warburg",
-          "ISBN": "978-0451524935",
-          "Año de publicacion": 1949,
-          "Idioma": "Inglés",
-          "Ejemplares": 8,
-          "Categoria": "Distopía",
-          "Sinopsis": "1984 es una novela distópica escrita por George Orwell. La historia está ambientada en un superestado ficticio llamado Oceanía, donde un partido político totalitario, liderado por el Gran Hermano, ejerce un control total sobre todos los aspectos de la vida."
-      },
-      {
-          "Titulo": "To Kill a Mockingbird",
-          "Autor": "Harper Lee",
-          "Editorial": "J.B. Lippincott & Co.",
-          "ISBN": "978-0061120084",
-          "Año de publicacion": 1960,
-          "Idioma": "Inglés",
-          "Ejemplares": 12,
-          "Categoria": "Novela clásica",
-          "Sinopsis": "To Kill a Mockingbird es una novela escrita por Harper Lee. La historia está ambientada en la década de 1930 en el ficticio pueblo de Maycomb, Alabama, y aborda cuestiones de raza y justicia en Estados Unidos."
-      },
-      {
-          "Titulo": "One Hundred Years of Solitude",
-          "Autor": "Gabriel García Márquez",
-          "Editorial": "Harper & Row",
-          "ISBN": "978-0061120091",
-          "Año de publicacion": 1970,
-          "Idioma": "Inglés",
-          "Ejemplares": 15,
-          "Categoria": "Realismo mágico",
-          "Sinopsis": "One Hundred Years of Solitude is a novel by Colombian author Gabriel García Márquez. It tells the multi-generational story of the Buendía family in the fictional town of Macondo."
-      },
-      {
-          "Titulo": "The Great Gatsby",
-          "Autor": "F. Scott Fitzgerald",
-          "Editorial": "Charles Scribner's Sons",
-          "ISBN": "978-0743273565",
-          "Año de publicacion": 1925,
-          "Idioma": "Inglés",
-          "Ejemplares": 7,
-          "Categoria": "Novela clásica",
-          "Sinopsis": "The Great Gatsby is a novel by F. Scott Fitzgerald set in the summer of 1922. The story explores themes of decadence, idealism, and the American Dream."
-      }
+    {
+      "Titulo": "Cien años de soledad",
+      "Autor": "Gabriel García Márquez",
+      "Editorial": "Sudamericana",
+      "ISBN": "978-84-376-0494-7",
+      "Año de publicacion": 1967,
+      "Idioma": "Español",
+      "Ejemplares": 10,
+      "Categoria": "Realismo mágico",
+      "Sinopsis": "Cien años de soledad es una novela del escritor colombiano Gabriel García Márquez, ganadora del Premio Nobel de Literatura en 1982. La obra narra la historia de la familia Buendía a lo largo de siete generaciones en el ficticio pueblo de Macondo."
+    },
+    {
+      "Titulo": "1984",
+      "Autor": "George Orwell",
+      "Editorial": "Secker & Warburg",
+      "ISBN": "978-0451524935",
+      "Año de publicacion": 1949,
+      "Idioma": "Inglés",
+      "Ejemplares": 8,
+      "Categoria": "Distopía",
+      "Sinopsis": "1984 es una novela distópica escrita por George Orwell. La historia está ambientada en un superestado ficticio llamado Oceanía, donde un partido político totalitario, liderado por el Gran Hermano, ejerce un control total sobre todos los aspectos de la vida."
+    },
+    {
+      "Titulo": "To Kill a Mockingbird",
+      "Autor": "Harper Lee",
+      "Editorial": "J.B. Lippincott & Co.",
+      "ISBN": "978-0061120084",
+      "Año de publicacion": 1960,
+      "Idioma": "Inglés",
+      "Ejemplares": 12,
+      "Categoria": "Novela clásica",
+      "Sinopsis": "To Kill a Mockingbird es una novela escrita por Harper Lee. La historia está ambientada en la década de 1930 en el ficticio pueblo de Maycomb, Alabama, y aborda cuestiones de raza y justicia en Estados Unidos."
+    },
+    {
+      "Titulo": "One Hundred Years of Solitude",
+      "Autor": "Gabriel García Márquez",
+      "Editorial": "Harper & Row",
+      "ISBN": "978-0061120091",
+      "Año de publicacion": 1970,
+      "Idioma": "Inglés",
+      "Ejemplares": 15,
+      "Categoria": "Realismo mágico",
+      "Sinopsis": "One Hundred Years of Solitude is a novel by Colombian author Gabriel García Márquez. It tells the multi-generational story of the Buendía family in the fictional town of Macondo."
+    },
+    {
+      "Titulo": "The Great Gatsby",
+      "Autor": "F. Scott Fitzgerald",
+      "Editorial": "Charles Scribner's Sons",
+      "ISBN": "978-0743273565",
+      "Año de publicacion": 1925,
+      "Idioma": "Inglés",
+      "Ejemplares": 7,
+      "Categoria": "Novela clásica",
+      "Sinopsis": "The Great Gatsby is a novel by F. Scott Fitzgerald set in the summer of 1922. The story explores themes of decadence, idealism, and the American Dream."
+    }
   ]
 }

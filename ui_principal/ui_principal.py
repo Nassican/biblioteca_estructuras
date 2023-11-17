@@ -26,8 +26,13 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import *
 from PySide6.QtCore import Qt, QThread, Signal, QPoint, QCoreApplication
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append('../')
+
 try:
     from ui_principal.ui_dashboard import SideMenu
+    from ui_principal.ui_registerbook import Ui_RegisterBook
     print("Exito al importar el SideMenu")
 except ImportError:
     print("Error al importar el archivo ui_dashboard.py")
@@ -955,15 +960,17 @@ class Ui_principal(QMainWindow):
 
         # Vista de perfil de usuario
         self.perfil_usuario = VistaUserProfile(self, self.user_data)
+        self.register_book = Ui_RegisterBook()
 
         self.vista_administrador = Dashboard(self, self.user_data)
         self.vista_administrador.setStyleSheet("background-color: white;")
         self.vista_administrador.side_menu.button_home.clicked.connect(self.switch_principal)
         self.vista_administrador.side_menu.button_perfil.clicked.connect(self.switch_perfil_usuario)
-        self.vista_administrador.side_menu.button_admin_libros.clicked.connect(lambda: print("Administrador Libros JAJA"))
+        self.vista_administrador.side_menu.button_admin_libros.clicked.connect(self.switch_register_book_admin)
         #self.vista_administrador.side_menu.button_close_session.clicked.connect()
         self.vista_administrador.stacked_widget.addWidget(self.principal_book_grid_widget)
         self.vista_administrador.stacked_widget.addWidget(self.perfil_usuario)
+        self.vista_administrador.stacked_widget.addWidget(self.register_book)
 
         central_vbox.addWidget(self.vista_administrador)
 
@@ -981,6 +988,10 @@ class Ui_principal(QMainWindow):
     def switch_vista_administrador(self):
         self.vistas_app.setCurrentWidget(self.vista_administrador)
         self.vistas_app.setStyleSheet("background-color: #1C3D95;")
+        
+    def switch_register_book_admin(self):
+        self.vista_administrador.stacked_widget.setCurrentWidget(self.register_book)
+        self.vista_administrador.setStyleSheet("background-color: white;")
 
 
 

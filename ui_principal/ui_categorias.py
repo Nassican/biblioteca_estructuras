@@ -4,6 +4,38 @@ from PySide6.QtCore import Qt
 import json
 import os
 
+class MessageWidget(QMessageBox):
+    def __init__(self):
+        super(MessageWidget, self).__init__()
+        self.setWindowTitle("Biblioteca SoftPro - Error")
+        self.button_message = QPushButton("Aceptar")
+        self.button_message.setCursor(Qt.PointingHandCursor)
+        self.addButton(self.button_message, QMessageBox.AcceptRole)
+        self.setIcon(QMessageBox.Critical)
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/libro.png")))
+        self.setStyleSheet(
+            "QMessageBox{ "
+            "border: 10px;"
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+
 class NuevaCategoriaDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -21,9 +53,11 @@ class NuevaCategoriaDialog(QDialog):
         buttons.accepted.connect(self.accept)
         boton_aceptar = buttons.button(QDialogButtonBox.Ok)
         boton_aceptar.setText("Aceptar")
+        boton_aceptar.setCursor(Qt.PointingHandCursor)
         buttons.rejected.connect(self.reject)
         boton_cancelar = buttons.button(QDialogButtonBox.Cancel)
         boton_cancelar.setText("Cancelar")
+        boton_cancelar.setCursor(Qt.PointingHandCursor)
 
 
         self.setStyleSheet(
@@ -54,7 +88,7 @@ class NuevaCategoriaDialog(QDialog):
           "background-color: #1C3D95; "
           "}"
           "QPushButton:pressed {"
-          "background-color: #2F5777"
+          "background-color: #2F53D1"
           "}"
         )
 
@@ -158,7 +192,7 @@ class EditarCategoriaDialog(QDialog):
           "background-color: #1C3D95; "
           "}"
           "QPushButton:pressed {"
-          "background-color: #2F5777"
+          "background-color: #2F53D1"
           "}"
         )
 
@@ -188,7 +222,7 @@ class EditarCategoriaDialog(QDialog):
     def obtener_nueva_categoria(self):
         return self.input_categoria.text()
 
-class CategoriasWidget(QWidget):
+class CategoriasWidget(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Categorías")
@@ -234,7 +268,7 @@ class CategoriasWidget(QWidget):
             "background-color: #1C3D95; "
             "}"
             "QPushButton:pressed {"
-            "background-color: #2F5777"
+            "background-color: #2F53D1"
             "}"
         )
 
@@ -367,45 +401,25 @@ class CategoriasWidget(QWidget):
             dialogo = EditarCategoriaDialog(categoria_actual, self)
             if dialogo.exec():
                 nueva_categoria = dialogo.obtener_nueva_categoria()
+                mensaje = MessageWidget()
 
                 # Verificar si la nueva categoría ya existe (excluyendo la categoría actual)
                 categorias_existentes = [categoria["categoria"] for i, categoria in enumerate(self.datos["categorias_libros"]) if i != fila_visible]
                 if nueva_categoria in categorias_existentes:
-                    mensaje = QMessageBox()
                     mensaje.setWindowIcon(QIcon(self.path_to_icon))
                     mensaje.setWindowTitle("Advertencia")
                     mensaje.setText("La categoría ya existe.")
-                    mensaje.setIcon(QMessageBox.Warning)
-                    boton_aceptar = QPushButton("Aceptar")
-                    mensaje.addButton(boton_aceptar, QMessageBox.AcceptRole)
-                    mensaje.setStyleSheet(
-                        "QMessageBox{ "
-                        "border: 10px;"
-                        "font-size: 15px; "
-                        "}"
-                        "QPushButton {"
-                        "background-color: #2F53D1; "
-                        "color: white; "
-                        "border-radius: 10px; "
-                        "padding: 5px; "
-                        "padding-left: 10px; "
-                        "padding-right: 10px; "
-                        "font-size: 15px; "
-                        "font-weight: bold; "
-                        "}"
-                        "QPushButton::hover {"
-                        "background-color: #1C3D95; "
-                        "}"
-                        "QPushButton:pressed {"
-                        "background-color: #2F5777"
-                        "}"
-                        )
                     mensaje.exec()
                 else:
                     # Realizar la edición
-                    self.datos["categorias_libros"][fila_visible]["categoria"] = nueva_categoria
-                    self.actualizar_tabla()
-                    self.guardar_en_archivo()
+                    if nueva_categoria.strip() != "": # Verificar que la categoría no esté vacía
+                        self.datos["categorias_libros"][fila_visible]["categoria"] = nueva_categoria
+                        self.actualizar_tabla()
+                        self.guardar_en_archivo()
+                    else:
+                        mensaje.setText("No se puede agregar una categoría vacía.")
+                        mensaje.setIcon(QMessageBox.Warning)
+                        mensaje.exec()
 
         return editar
 
@@ -423,44 +437,25 @@ class CategoriasWidget(QWidget):
         dialogo_nueva_categoria = NuevaCategoriaDialog(self)
         if dialogo_nueva_categoria.exec():
             nueva_categoria = dialogo_nueva_categoria.obtener_nombre_categoria()
+            mensaje = MessageWidget()
 
             # Verificar si la categoría ya existe
             if any(categoria["categoria"] == nueva_categoria for categoria in self.datos["categorias_libros"]):
-                mensaje = QMessageBox()
                 mensaje.setWindowIcon(QIcon(self.path_to_icon))
                 mensaje.setWindowTitle("Advertencia")
                 mensaje.setText("La categoría ya existe.")
                 mensaje.setIcon(QMessageBox.Warning)
-                boton_aceptar = QPushButton("Aceptar")
-                mensaje.addButton(boton_aceptar, QMessageBox.AcceptRole)
-                mensaje.setStyleSheet(
-                    "QMessageBox{ "
-                    "border: 10px;"
-                    "font-size: 15px; "
-                    "}"
-                    "QPushButton {"
-                    "background-color: #2F53D1; "
-                    "color: white; "
-                    "border-radius: 10px; "
-                    "padding: 5px; "
-                    "padding-left: 10px; "
-                    "padding-right: 10px; "
-                    "font-size: 15px; "
-                    "font-weight: bold; "
-                    "}"
-                    "QPushButton::hover {"
-                    "background-color: #1C3D95; "
-                    "}"
-                    "QPushButton:pressed {"
-                    "background-color: #2F5777"
-                    "}"
-                    )
                 mensaje.exec()
             else:
                 # Agregar la nueva categoría al JSON
-                self.datos["categorias_libros"].append({"categoria": nueva_categoria})
-                self.actualizar_tabla()
-                self.guardar_en_archivo()
+                if nueva_categoria.strip() != "":
+                    self.datos["categorias_libros"].append({"categoria": nueva_categoria})
+                    self.actualizar_tabla()
+                    self.guardar_en_archivo()
+                else:
+                    mensaje.setText("No se puede agregar una categoría vacía.")
+                    mensaje.setIcon(QMessageBox.Warning)
+                    mensaje.exec()
 
     def guardar_en_archivo(self):
         path_to_json = os.path.join(os.path.dirname(__file__), "../databases/categorias.json")
