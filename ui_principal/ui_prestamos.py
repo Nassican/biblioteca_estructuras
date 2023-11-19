@@ -4,7 +4,7 @@ from PySide6.QtWidgets import *
 class MiInterfaz(QWidget):
     def __init__(self):
         super().__init__()
-
+        # Pal commit diario
         # Establece la ventana principal como un cuadrado
         self.setGeometry(100, 100, 600, 500)  # Ajusta el tamaño según sea necesario
         self.setWindowTitle("Mi Aplicación")  # Cambia el título de la ventana
