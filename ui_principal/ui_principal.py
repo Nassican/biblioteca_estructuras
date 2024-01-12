@@ -3,6 +3,7 @@ import json
 import os
 import requests
 import shutil
+from datetime import datetime
 
 from PySide6.QtWidgets import (
     QApplication,
@@ -25,7 +26,7 @@ from PySide6.QtWidgets import (
     QFileDialog,
 )
 from PySide6.QtGui import *
-from PySide6.QtCore import Qt, QThread, Signal, QPoint, QCoreApplication
+from PySide6.QtCore import Qt, QThread, Signal, QPoint, QCoreApplication, QTimer
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append('../')
@@ -33,6 +34,7 @@ sys.path.append('../')
 try:
     from ui_principal.ui_dashboard import SideMenu
     from ui_principal.ui_registerbook import Ui_RegisterBook
+    from ui_principal.ui_prestamos import Ui_Prestamos_admin, Ui_Prestamos_user
     print("Exito al importar el SideMenu")
 except ImportError:
     print("Error al importar el archivo ui_dashboard.py")
@@ -224,23 +226,47 @@ class ImageLoader(QThread):
             self.image_loaded.emit(response.content)
         self.loading_finished.emit()
 
+class MessageWidget(QMessageBox):
+    def __init__(self):
+        super(MessageWidget, self).__init__()
+        self.setWindowTitle("Biblioteca SoftPro - Imagen de perfil")
+        self.button_message = QPushButton("Aceptar")
+        self.button_message.setCursor(Qt.PointingHandCursor)
+        self.addButton(self.button_message, QMessageBox.AcceptRole)
+        self.setIcon(QMessageBox.Critical)
+        self.setWindowIcon(
+            QIcon(os.path.join(basedir, "../media/img/libro.png")))
+        self.setStyleSheet(
+            "QMessageBox{ "
+            "border: 10px;"
+            "font-size: 15px; "
+            "}"
+            "QPushButton {"
+            "background-color: #2F53D1; "
+            "color: white; "
+            "border-radius: 10px; "
+            "padding: 5px; "
+            "padding-left: 10px; "
+            "padding-right: 10px; "
+            "font-size: 15px; "
+            "font-weight: bold; "
+            "}"
+            "QPushButton::hover {"
+            "background-color: #1C3D95; "
+            "}"
+            "QPushButton:pressed {"
+            "background-color: #2F5777"
+            "}"
+        )
+
 class BookWidget(QWidget):
-    def __init__(self, book_data):
+    def __init__(self, book_data, user_data):
         super().__init__()
+        self.user_data = user_data
 
-        self.image_label = QLabel()
-        self.image_label.setFixedSize(200, 300)
-        image_url = book_data.get("imagen_url", "")
-        self.image_loader = ImageLoader(image_url)
-
-        # Conecta la señal para cargar la imagen al método que maneja la imagen cargada
-        self.image_loader.image_loaded.connect(self.set_image)
-
-        self.image_loader.start()
-
-        # Crea un layout vertical para el widget del libro
-        layout = QVBoxLayout()
-        self.image_label.setStyleSheet(
+        image_label = QLabel()
+        image_label.setFixedSize(200, 300)
+        image_label.setStyleSheet(
             "QLabel {"
             "   background-color: white;"
             "   border-radius: 10px;"
@@ -248,40 +274,48 @@ class BookWidget(QWidget):
             "}"
         )
 
-        # Agrega la etiqueta de imagen al layout
-        layout.addWidget(self.image_label)
-
-        # Establece el layout para el widget
+        layout = QVBoxLayout()
+        layout.addWidget(image_label)
         self.setLayout(layout)
-        self.add_shadow()
-        self.book_data = book_data
 
-    def set_image(self, image_data):
-        pixmap = QPixmap()
-        pixmap.loadFromData(image_data)
-        scaled_pixmap = pixmap.scaled(200, 300, Qt.KeepAspectRatio)
-        self.image_label.setPixmap(scaled_pixmap)
-        self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.setCursor(Qt.PointingHandCursor)
-        shadow = self.add_shadow()
-        self.image_label.setGraphicsEffect(shadow)
-        self.image_label.mousePressEvent = self.show_book_info  # Conecta el evento de clic
+        self.add_shadow(image_label)
 
-    def add_shadow(self):
+        path_to_img = os.path.join(basedir, f"../media/librosCovers/{book_data['ISBN']}/coverBook.png")
+        self.set_image(image_label, path_to_img)
+        image_label.mousePressEvent = lambda event: self.show_book_info(book_data)
+
+    def set_image(self, image_label, image_path):
+        pixmap = QPixmap(image_path)
+        if not pixmap.isNull():
+            scaled_pixmap = pixmap.scaled(200, 300, Qt.KeepAspectRatio)
+            image_label.setPixmap(scaled_pixmap)
+            image_label.setAlignment(Qt.AlignCenter)
+            image_label.setCursor(Qt.PointingHandCursor)
+        else:
+            print(f"Error al cargar la imagen desde: {image_path}")
+
+    def add_shadow(self, widget):
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(5)  # Ajusta según tus preferencias
+        shadow.setBlurRadius(5)
         shadow.setColor(Qt.black)
         shadow.setOffset(0, 0)
+        widget.setGraphicsEffect(shadow)
 
-        return shadow
-
-    def show_book_info(self, event):
-        book_widget = BookInfoWidget(self.book_data)
+    def show_book_info(self, book_data):
+        book_widget = BookInfoWidget(book_data, self.user_data)
         book_widget.exec()
 
 class BookGridVistaInicio(QWidget):
-    def __init__(self):
+    def __init__(self, user_data):
         super().__init__()
+        self.user_data = user_data
+
+        self.max_books_to_show = 10
+        # Configura un temporizador para actualizar los libros cada 10 segundos
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_books)
+        self.timer.start(10000)
+
         central_layout = QVBoxLayout()
         central_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
         central_layout.setContentsMargins(0, 0, 0, 0)
@@ -291,63 +325,101 @@ class BookGridVistaInicio(QWidget):
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet("font-size: 40px; font-weight: bold; color: black; padding: 5px; text-align: center;")
 
-        # QScrollArea que contendrá el grid_layout
         scroll_area = QScrollArea(self)
-        scroll_area.setWidgetResizable(True)  # Ajusta el contenido al tamaño del área
+        scroll_area.setWidgetResizable(True)
 
-        # QWidget para alojar el grid_layout
         scroll_content = QWidget(self)
         scroll_content.setContentsMargins(0, 0, 0, 0)
         scroll_area.setWidget(scroll_content)
         scroll_area.setStyleSheet("QScrollArea{border: 20px;} QMessageBox{ border: 0px;}")
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Desactiva la barra de desplazamiento horizontal
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         grid_layout = QGridLayout()
+        self.grid_layout = grid_layout
         scroll_content.setLayout(grid_layout)
-
-        # Establece el espaciado entre elementos a 0
         grid_layout.setSpacing(0)
 
-        num_columns = 4  # Define el número de columnas en el QGridLayout
-        max_books_to_show = 4  # Define el número máximo de libros a mostrar
-        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/librosConImagenes.json")
+        num_columns = 4
+        max_books_to_show = self.max_books_to_show
 
-        # Lee los datos de libros desde el archivo libros.json
-        with open(path_to_json, "r", encoding="utf-8") as json_file:
-            books_data = json.load(json_file)
+        # Mueve la lógica de lectura de datos del libro aquí
+        data_books = self.load_book_data()
 
         grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-
         grid_layout.addWidget(title, 0, 0, 1, num_columns)
+
         row = 1
-        for i, book in enumerate(books_data[:max_books_to_show]):
-            # Crea un widget para el libro y pasa los datos del libro como argumento
-            book_widget = BookWidget(book)
-
-            # Calcula la fila y la columna actual en función del índice
+        for i, book in enumerate(data_books[:max_books_to_show]):
+            book_widget = BookWidget(book, self.user_data)
             col = i % num_columns
-
-            # Agrega el widget del libro al QGridLayout en la fila y columna calculadas
             grid_layout.addWidget(book_widget, row, col)
-
             if col == num_columns - 1:
                 row += 1
 
-        scroll_content.adjustSize()  # Ajusta el tamaño del contenido al tamaño del QScrollArea
-        # Agrega el QScrollArea al layout central
+        scroll_content.adjustSize()
+        self.scroll_content = scroll_content
         central_layout.addWidget(scroll_area)
         self.setLayout(central_layout)
 
+    def load_book_data(self):
+        path_to_json = os.path.join(os.path.dirname(__file__), "../databases/libros_db.json")
+        try:
+            with open(path_to_json, "r", encoding="utf-8") as json_file:
+                data = json.load(json_file)
+                return data.get('Libros', [])
+        except FileNotFoundError:
+            print(f"Error: El archivo JSON no fue encontrado en la ruta: {path_to_json}")
+            return []
+
+    def closeEvent(self, event):
+        # Detener el temporizador antes de cerrar la ventana
+        self.timer.stop()
+        event.accept()
+
+    def update_books(self):
+        data_books = self.load_book_data()
+
+        # Limpiar widgets existentes
+        while self.grid_layout.count():
+            item = self.grid_layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
+        row = 1
+        num_columns = 4
+        max_books_to_show = self.max_books_to_show
+
+        title = QLabel("LIBROS MÁS POPULARES")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 40px; font-weight: bold; color: black; padding: 5px; text-align: center;")
+
+        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
+        self.grid_layout.addWidget(title, 0, 0, 1, num_columns)
+
+        for i, book_data in enumerate(data_books[:max_books_to_show]):
+            book_widget = BookWidget(book_data, self.user_data)
+            col = i % num_columns
+            self.grid_layout.addWidget(book_widget, row, col)
+            if col == num_columns - 1:
+                row += 1
+
+        self.scroll_content.adjustSize()
+
+
 class BookInfoWidget(QDialog):
-    def __init__(self, book_data):
+    def __init__(self, book_data, user_data):
         super().__init__()
-        width = 400
-        height = 250
-        self.width = width
-        self.height = height
-        self.setMaximumSize(width, height)
-        self.setMinimumSize(width, height)
+        self.book_data = book_data
+        self.user_data = user_data
+        self.messageBox = MessageWidget()
+        self.setup_ui()
+        self.load_book_info(book_data)
+
+    def setup_ui(self):
+        width, height = 600, 300
+        self.setFixedSize(width, height)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setStyleSheet(
             "QDialog {"
@@ -374,31 +446,37 @@ class BookInfoWidget(QDialog):
             "background-color: #2F5777"
             "}"
         )
-        # Crea un layout vertical para el widget del libro
-        layout = QHBoxLayout()
+
+        layout = QHBoxLayout(self)
 
         self.image_label = QLabel()
         self.image_label.setGraphicsEffect(QGraphicsDropShadowEffect(blurRadius=20, xOffset=0, yOffset=0))
         self.image_label.setMaximumSize(width/2, height)
-        image_url = book_data.get("imagen_url", "")
-        self.image_loader = ImageLoader(image_url)
-        # Conecta la señal para cargar la imagen al método que maneja la imagen cargada
-        self.image_loader.image_loaded.connect(self.set_image)
-        # Agrega la etiqueta de imagen al layout
-        self.image_loader.start()
-        layout.addWidget(self.image_label)
 
         layout_info = QVBoxLayout()
-        # Establece el layout para el widget
-        info = book_data
-        info_text = f"Título: {info['titulo']}\nAutor: {info['autor']}\nAño: {info['año_publicacion']}\nGénero: {info['genero']}\nEditorial: {info['editorial']}"
-        info_label = QLabel(info_text, self)
-        info_label.setWordWrap(True)
-        info_label.setMaximumWidth(width/2)
-        layout_info.addWidget(info_label)
+
+        layout.addWidget(self.image_label)
+        layout.addLayout(layout_info)
+
+        self.info_label = QLabel(self)
+        self.info_label.setWordWrap(True)
+        self.info_label.setMaximumWidth(width/2)
+        layout_info.addWidget(self.info_label)
         layout_info.setAlignment(Qt.AlignTop)
 
-        # Agregar un botón de cierre
+
+        hacer_pres = QPushButton("Pedir Libro")
+        hacer_pres.setCursor(Qt.PointingHandCursor)
+        hacer_pres.setMaximumHeight(30)
+        hacer_pres.setLayoutDirection(Qt.RightToLeft)
+        # TODO: Agregar la funcionalidad para pedir el libro
+        hacer_pres.clicked.connect(self.hacer_prestamo)
+        hacer_pres.setStyleSheet(
+            """
+            background-color: #067A14;
+            """)
+        layout_info.addWidget(hacer_pres)
+
         close_button = QPushButton("Cerrar", self)
         close_button.setCursor(Qt.PointingHandCursor)
         close_button.setMaximumHeight(30)
@@ -406,29 +484,125 @@ class BookInfoWidget(QDialog):
         close_button.clicked.connect(self.close)
         layout_info.addWidget(close_button)
 
-        layout.addLayout(layout_info)
         self.setLayout(layout)
-        #print(book_data)
 
-    def set_image(self, image_data):
-        pixmap = QPixmap()
-        pixmap.loadFromData(image_data)
-        scaled_pixmap = pixmap.scaled(self.image_label.size(),Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        self.image_label.setPixmap(scaled_pixmap)
-        self.image_label.setAlignment(Qt.AlignCenter)
-        shadow = self.add_shadow()
-        self.image_label.setGraphicsEffect(shadow)
+    def hacer_prestamo(self):
+        # Verificar ejemplares disponibles antes de hacer el préstamo
+        ejemplares_disponibles = int(self.book_data['Ejemplares'])
+        if ejemplares_disponibles > 0:
+            # Restar un ejemplar al libro
+            self.book_data['Ejemplares'] = str(ejemplares_disponibles - 1)
+
+            # Lógica para realizar el préstamo y actualizar archivos JSON
+            prestamo_info = {
+                "Titulo": self.book_data["Titulo"],
+                "Autor": self.book_data["Autor"],
+                "Fecha": datetime.today().strftime('%Y-%m-%d')
+            }
+
+            # Actualiza el archivo de préstamos
+            self.actualizar_prestamos(prestamo_info)
+
+            # Actualiza el archivo libros_db.json restando un ejemplar
+            self.actualizar_libros_db()
+
+            # Cierra el diálogo después de realizar el préstamo
+            self.close()
+        else:
+            self.messageBox.setText("No hay ejemplares disponibles de este libro.")
+            self.messageBox.exec()
+
+    def actualizar_prestamos(self, prestamo_info):
+        # Carga los datos actuales de prestamos.json
+        path_to_prestamos = os.path.join(basedir, "../databases/prestamos.json")
+        try:
+            with open(path_to_prestamos, "r", encoding="utf-8") as json_file:
+                data = json.load(json_file)
+        except FileNotFoundError:
+            data = {"prestamos": []}
+
+        # Busca si existe un registro de préstamo con el UUID actual
+        uuid = self.user_data["uuid"]
+        prestamo_existente = next((p for p in data["prestamos"] if p["uuid"] == uuid), None)
+
+        # Si existe, agrega el nuevo préstamo
+        if prestamo_existente:
+            prestamo_existente["prestamos"].append(prestamo_info)
+        else:
+            # Si no existe, crea un nuevo registro de préstamo
+            nuevo_prestamo = {"uuid": uuid, "prestamos": [prestamo_info]}
+            data["prestamos"].append(nuevo_prestamo)
+
+        # Guarda los datos actualizados en prestamos.json
+        with open(path_to_prestamos, "w", encoding="utf-8") as json_file:
+            json.dump(data, json_file, indent=2, ensure_ascii=False)
+
+    def actualizar_libros_db(self):
+        # Resta un ejemplar al libro actual en libros_db.json
+        path_to_libros_db = os.path.join(basedir, "../databases/libros_db.json")
+        try:
+            with open(path_to_libros_db, "r", encoding="utf-8") as json_file:
+                data = json.load(json_file)
+        except FileNotFoundError:
+            print(f"Error: El archivo JSON no fue encontrado en la ruta: {path_to_libros_db}")
+            return
+
+        # Busca el libro actual en libros_db.json
+        libro_actual = next((libro for libro in data["Libros"] if libro["ISBN"] == self.book_data["ISBN"]), None)
+        # Si encuentra el libro, resta un ejemplar
+        if libro_actual and "Ejemplares" in libro_actual:
+            libro_actual["Ejemplares"] = str(int(libro_actual["Ejemplares"]) - 1)
+
+            # Guarda los datos actualizados en libros_db.json
+            with open(path_to_libros_db, "w", encoding="utf-8") as json_file:
+                json.dump(data, json_file, indent=2, ensure_ascii=False)
+
+            self.messageBox.setText(f"Se ha realizado un préstamo del libro: {self.book_data['Titulo']}")
+            self.messageBox.setIcon(QMessageBox.Information)
+            self.messageBox.exec()
+            # print(f"Se ha realizado un préstamo del libro: {self.book_data['Titulo']}")
+        else:
+            print(f"No se pudo encontrar el libro en libros_db.json")
+
+    def load_book_info(self, info):
+        path_to_img = os.path.join(basedir, f"../media/librosCovers/{info['ISBN']}/coverBook.png")
+        self.set_image(path_to_img)
+
+        info_text = (
+            f"Título: {info['Titulo']}\n"
+            f"Autor: {info['Autor']}\n"
+            f"Editorial: {info['Editorial']}\n"
+            f"ISBN: {info['ISBN']}\n"
+            f"Año de publicación: {info['Año de publicacion']}\n"
+            f"Idioma: {info['Idioma']}\n"
+            f"Ejemplares: {info['Ejemplares']}\n"
+            f"Género: {info['Categoria']}\n"
+            f"Sinopsis: {info['Sinopsis']}\n"
+        )
+        self.info_label.setText(info_text)
+
+    def set_image(self, image_path):
+        pixmap = QPixmap(image_path)
+        if not pixmap.isNull():
+            scaled_pixmap = pixmap.scaled(200, 300, Qt.KeepAspectRatio)
+            self.image_label.setPixmap(scaled_pixmap)
+            self.image_label.setAlignment(Qt.AlignCenter)
+            self.image_label.setCursor(Qt.PointingHandCursor)
+            shadow = self.add_shadow()
+            self.image_label.setGraphicsEffect(shadow)
+        else:
+            print(f"Error al cargar la imagen desde: {image_path}")
 
     def add_shadow(self):
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(20)  # Ajusta según tus preferencias
+        shadow.setBlurRadius(20)
         shadow.setColor(Qt.black)
         shadow.setOffset(0, 0)
-
         return shadow
 
     def show_widget(self):
         self.show()
+
 
 class ProfileImageWidget(QWidget):
     def __init__(self, user_data):
@@ -754,7 +928,7 @@ class VistaUserProfile(QWidget):
         self.layout_buttom.setContentsMargins(0, 0, 0, 0)
         self.layout_buttom.setSpacing(50)
 
-        self.boton_prestamos = QPushButton("Ver mis prestamos")
+        self.boton_prestamos = QPushButton(" Mis prestamos")
         self.boton_prestamos.setMaximumWidth(200)
         self.boton_prestamos.setCursor(Qt.PointingHandCursor)
         self.layout_buttom.addWidget(self.boton_prestamos)
@@ -856,9 +1030,6 @@ class Dashboard(QWidget):
         window = MiVentana()
         window.show()
 
-class VistaGestionLibros(QWidget):
-    pass
-
 class Ui_principal(QMainWindow):
     logout_signal = Signal()
     color_bar = "#2F53D1"
@@ -907,7 +1078,7 @@ class Ui_principal(QMainWindow):
         self.setWindowTitle("Bienvenido a Biblioteca Softpro")
         self.setGeometry(50, 50, 1280, 720)
         self.setMinimumSize(1200, 600)
-        path_icon = os.path.join(os.path.dirname(__file__), "../media/img/libro.png")
+        path_icon = os.path.join(basedir, "../media/img/libro.png")
         icon = QIcon(path_icon)
         self.setWindowIcon(icon)
         self.setWindowFlags(Qt.FramelessWindowHint)
@@ -956,21 +1127,27 @@ class Ui_principal(QMainWindow):
 
 
         # Vista de inicio de la biblioteca
-        self.principal_book_grid_widget = BookGridVistaInicio()
+        self.principal_book_grid_widget = BookGridVistaInicio(self.user_data)
 
         # Vista de perfil de usuario
         self.perfil_usuario = VistaUserProfile(self, self.user_data)
         self.register_book = Ui_RegisterBook()
+        self.prestamos_books_admin = Ui_Prestamos_admin()
+        self.prestamos_books_user = Ui_Prestamos_user(self, self.user_data)
 
         self.vista_administrador = Dashboard(self, self.user_data)
         self.vista_administrador.setStyleSheet("background-color: white;")
         self.vista_administrador.side_menu.button_home.clicked.connect(self.switch_principal)
         self.vista_administrador.side_menu.button_perfil.clicked.connect(self.switch_perfil_usuario)
         self.vista_administrador.side_menu.button_admin_libros.clicked.connect(self.switch_register_book_admin)
+        self.vista_administrador.side_menu.button_prestamos_admin.clicked.connect(self.switch_vista_prestamos_admin)
+        self.vista_administrador.side_menu.button_prestamos_user.clicked.connect(self.switch_vista_prestamos_user)
         #self.vista_administrador.side_menu.button_close_session.clicked.connect()
         self.vista_administrador.stacked_widget.addWidget(self.principal_book_grid_widget)
         self.vista_administrador.stacked_widget.addWidget(self.perfil_usuario)
         self.vista_administrador.stacked_widget.addWidget(self.register_book)
+        self.vista_administrador.stacked_widget.addWidget(self.prestamos_books_admin)
+        self.vista_administrador.stacked_widget.addWidget(self.prestamos_books_user)
 
         central_vbox.addWidget(self.vista_administrador)
 
@@ -988,7 +1165,15 @@ class Ui_principal(QMainWindow):
     def switch_vista_administrador(self):
         self.vistas_app.setCurrentWidget(self.vista_administrador)
         self.vistas_app.setStyleSheet("background-color: #1C3D95;")
-        
+
+    def switch_vista_prestamos_admin(self):
+        self.vista_administrador.stacked_widget.setCurrentWidget(self.prestamos_books_admin)
+        self.vista_administrador.setStyleSheet("background-color: white;")
+
+    def switch_vista_prestamos_user(self):
+        self.vista_administrador.stacked_widget.setCurrentWidget(self.prestamos_books_user)
+        self.vista_administrador.setStyleSheet("background-color: white;")
+
     def switch_register_book_admin(self):
         self.vista_administrador.stacked_widget.setCurrentWidget(self.register_book)
         self.vista_administrador.setStyleSheet("background-color: white;")

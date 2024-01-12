@@ -12,7 +12,11 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 
-json_path = os.path.join(os.path.dirname(__file__), "../databases/libros_db.json")
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+json_path = os.path.join(os.path.dirname(
+    __file__), "../databases/libros_db.json")
+
 
 class MessageWidget(QMessageBox):
     def __init__(self):
@@ -22,7 +26,8 @@ class MessageWidget(QMessageBox):
         self.button_message.setCursor(Qt.PointingHandCursor)
         self.addButton(self.button_message, QMessageBox.AcceptRole)
         self.setIcon(QMessageBox.Critical)
-        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "../media/img/libro.png")))
+        self.setWindowIcon(
+            QIcon(os.path.join(basedir, "../media/img/libro.png")))
         self.setStyleSheet(
             "QMessageBox{ "
             "border: 10px;"
@@ -46,10 +51,12 @@ class MessageWidget(QMessageBox):
             "}"
         )
 
+
 class Ui_RegisterBook(QWidget):
     def __init__(self):
         super(Ui_RegisterBook, self).__init__()
-        path_to_img = os.path.join(os.path.dirname(__file__), "./media/img/arrow-down-combobox.png")
+        path_to_img = os.path.join(os.path.dirname(
+            __file__), "./media/img/arrow-down-combobox.png")
         self.image_path = ""
         self.setStyleSheet(
             "QPushButton {"
@@ -119,7 +126,7 @@ class Ui_RegisterBook(QWidget):
             "QTextEdit::disabled {"
             "background-color: #E5E5E5; "
             "}"
-            
+
         )
 
         central_layout = QVBoxLayout()
@@ -165,6 +172,7 @@ class Ui_RegisterBook(QWidget):
             "background-color: #095012"
             "}"
         )
+        button_editar.clicked.connect(self.listar_libros)
         form_botons.addWidget(button_añadir)
         form_botons.addWidget(button_editar)
 
@@ -181,6 +189,8 @@ class Ui_RegisterBook(QWidget):
         self.button_escoger_imagen = QPushButton("Escoger Imagen Libro")
         shadow_label = self.shadow_effect()
         self.imagen_label.setGraphicsEffect(shadow_label)
+        default_image_path = os.path.join(os.path.dirname(__file__), "../media/imgDefault/NO COVER.png")
+        self.load_and_display_image(default_image_path, self.imagen_label.size())
 
         self.button_escoger_imagen.setEnabled(False)
         self.button_escoger_imagen.setStyleSheet(
@@ -216,6 +226,7 @@ class Ui_RegisterBook(QWidget):
         self.line_edit_año = QLineEdit()
         self.line_edit_año.setPlaceholderText("Año de publicación")
         self.line_edit_año.setEnabled(False)
+        self.line_edit_año.setValidator(QIntValidator())
         self.line_edit_idioma = QLineEdit()
         self.line_edit_idioma.setPlaceholderText("Idioma")
         self.line_edit_idioma.setEnabled(False)
@@ -224,7 +235,8 @@ class Ui_RegisterBook(QWidget):
 
         h_ejemplares_categoria = QHBoxLayout()
         self.line_edit_ejemplares = QLineEdit()
-        self.line_edit_ejemplares.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.line_edit_ejemplares.setSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.line_edit_ejemplares.setPlaceholderText("Ejemplares (*)")
         self.line_edit_ejemplares.setEnabled(False)
         self.line_edit_ejemplares.setValidator(QIntValidator())
@@ -232,8 +244,9 @@ class Ui_RegisterBook(QWidget):
         self.combobox_categoria.setCursor(Qt.PointingHandCursor)
         self.combobox_categoria.setEnabled(False)
         self.combobox_categoria.addItem("Sin categoría")
-        self.load_categories()
-        self.combobox_categoria.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.load_categories(self.combobox_categoria)
+        self.combobox_categoria.setSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Fixed)
         h_ejemplares_categoria.addWidget(self.line_edit_ejemplares)
         h_ejemplares_categoria.addWidget(self.combobox_categoria)
 
@@ -242,7 +255,8 @@ class Ui_RegisterBook(QWidget):
         self.line_edit_sinopsis.wordWrapMode()
         self.line_edit_sinopsis.setAlignment(Qt.AlignTop)
         self.line_edit_sinopsis.setEnabled(False)
-        self.line_edit_sinopsis.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.line_edit_sinopsis.setSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         # Configurar QSizePolicy para que los elementos ocupen todo el espacio horizontal disponible
         form_right_side.setSizeConstraint(QLayout.SetMinimumSize)
@@ -261,7 +275,8 @@ class Ui_RegisterBook(QWidget):
 
         # Agregar espacios elásticos para distribuir equitativamente los elementos en form_layout
         form_layout.addWidget(form_container_left_side)
-        form_container_left_side.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        form_container_left_side.setSizePolicy(
+            QSizePolicy.Expanding, QSizePolicy.Expanding)
         form_layout.addWidget(form_container_right_side)
 
         form_container.setLayout(form_layout)
@@ -278,8 +293,9 @@ class Ui_RegisterBook(QWidget):
             "}"
         )
         self.button_eliminar = QPushButton("Eliminar")
-        self.button_eliminar.setCursor(Qt.PointingHandCursor)#D12F2F
-        self.button_eliminar.setStyleSheet("background-color: #E38E8E; color: white; font-weight: bold;")
+        self.button_eliminar.setCursor(Qt.PointingHandCursor)  # D12F2F
+        self.button_eliminar.setStyleSheet(
+            "background-color: #E38E8E; color: white; font-weight: bold;")
         self.button_eliminar.setEnabled(False)
         self.button_ver_prestamos = QPushButton("Ver Prestamos")
         self.button_ver_prestamos.setCursor(Qt.PointingHandCursor)
@@ -301,7 +317,8 @@ class Ui_RegisterBook(QWidget):
     def resizeEvent(self, event):
         # Llamamos a la función para cargar y mostrar la imagen con el tamaño actual
         if self.image_path:
-            self.load_and_display_image(self.image_path, self.imagen_label.size())
+            self.load_and_display_image(
+                self.image_path, self.imagen_label.size())
 
     def añadir_categoria(self):
         categoria_widget = CategoriasWidget()
@@ -309,7 +326,7 @@ class Ui_RegisterBook(QWidget):
         self.actualizar_categorias_combobox()
 
     def añadir_libro(self):
-        #Activar botones
+        # Activar botones
         self.button_escoger_imagen.setEnabled(True)
         self.button_escoger_imagen.setStyleSheet(
             "QPushButton {"
@@ -421,48 +438,387 @@ class Ui_RegisterBook(QWidget):
         if not os.path.exists(directorio_imagen):
             os.makedirs(directorio_imagen)
 
-        # Crear la ruta completa de la imagen
-        ruta_imagen = os.path.join(directorio_imagen, "coverBook.png")
-
-        # Guardar la imagen
-        if self.imagen_label.pixmap():
-            self.imagen_label.pixmap().save(ruta_imagen)
-
-        new_book = {
-            "Titulo": titulo,
-            "Autor": autor,
-            "Editorial": editorial,
-            "ISBN": isbn,
-            "Año de publicacion": año,
-            "Idioma": idioma,
-            "Ejemplares": ejemplares,
-            "Categoria": categoria,
-            "Sinopsis": sinopsis,
-        }
-
-        libros_db = self.load_database_books()
-        libros_db.append(new_book)
-        self.actualizar_base_de_datos(libros_db)
-
+        # Revisar si el codigo no existe en la base de datos
         self.message = MessageWidget()
-        self.message.setText("Libro guardado con éxito")
-        self.message.setIcon(QMessageBox.Information)
-        self.message.exec()
+
+        if not titulo or not autor or not editorial or not isbn or not año or not idioma or not ejemplares or not categoria or not sinopsis:
+            self.message.setText("Todos los campos son obligatorios.")
+            self.message.exec()
+        elif not titulo:
+            self.message.setText("El campo de titulo no puede estar vacío.")
+            self.message.exec()
+        elif not autor:
+            self.message.setText("El campo de autor no puede estar vacío.")
+            self.message.exec()
+        elif not editorial:
+            self.message.setText("El campo de editorial no puede estar vacío.")
+            self.message.exec()
+        elif not isbn:
+            self.message.setText("El campo de ISBN no puede estar vacío.")
+            self.message.exec()
+        elif not año:
+            self.message.setText(
+                "El campo de Año de publicación no puede estar vacío.")
+            self.message.exec()
+        elif not idioma:
+            self.message.setText("El campo de idioma no puede estar vacío.")
+            self.message.exec()
+        elif self.id_ISBN_esta_disponible(isbn) == True:
+            self.message.setText("El número ISBN ya está en uso.")
+            self.message.exec()
+        elif not ejemplares:
+            self.message.setText(
+                "El campo de ejemplares no puede estar vacío.")
+            self.message.exec()
+        elif self.verificarInt(ejemplares) == False:
+            self.message.setText("El campo de ejemplares solo acepta números.")
+            self.message.exec()
+        elif self.verificarInt(año) == False:
+            self.message.setText("El campo de año solo acepta números.")
+            self.message.exec()
+        else:
+            new_book = {
+                "Titulo": titulo,
+                "Autor": autor,
+                "Editorial": editorial,
+                "ISBN": isbn,
+                "Año de publicacion": año,
+                "Idioma": idioma,
+                "Ejemplares": ejemplares,
+                "Categoria": categoria,
+                "Sinopsis": sinopsis,
+            }
+
+            try:
+                libros_db = self.load_database_books()
+                libros_db.append(new_book)
+                self.actualizar_base_de_datos(libros_db)
+
+                ruta_imagen = os.path.join(directorio_imagen, "coverBook.png")
+                # Guardar la imagen
+                if self.imagen_label.pixmap():
+                    self.imagen_label.pixmap().save(ruta_imagen)
+
+                self.message.setText("Libro guardado con éxito")
+                self.message.setIcon(QMessageBox.Information)
+                self.message.exec()
+            except Exception as e:
+                print(f"Error al copiar la imagen: {str(e)}")
+
+    def listar_libros(self):
+        # Obtener la lista de libros
+        libros_db = self.load_database_books()
+
+        # Crear una ventana emergente para mostrar la lista de libros
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Lista de Libros")
+        dialog.setGeometry(300, 300, 700, 350)
+
+        layout = QVBoxLayout(dialog)
+
+        # Agregar un QLineEdit para la búsqueda
+        search_layout = QHBoxLayout()
+        search_label = QLabel("Buscar:")
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Ingrese título o ISBN")
+        self.search_input.textChanged.connect(lambda: self.filtrar_libros(libros_db, table_widget))
+        search_layout.addWidget(search_label)
+        search_layout.addWidget(self.search_input)
+
+        layout.addLayout(search_layout)
+
+        # Crear un QTableWidget para mostrar los títulos y códigos ISBN de los libros
+        table_widget = QTableWidget(dialog)
+        table_widget.setStyleSheet("""
+            QScrollBar:vertical {
+                width: 10px;
+                border-radius: 4px;
+            }
+
+            QScrollBar::handle:vertical {
+                background-color: #2F53D1;
+                border-radius: 4px;
+            }
+
+            QScrollBar::add-line:vertical {
+                height: 0px;
+            }
+
+            QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+            QTableWidget {
+                border: 1px solid #2F53D1;
+                border-radius: 5px;
+                font-size: 15px;
+                padding: 5px;
+            }
+            QTableWidget:item {
+               background-color: white;
+               color: black;
+            }
+            QTableWidget:item:alternate {
+               background-color: #EEEEEE;
+            }
+        """)
+        self.table_widget = table_widget
+        table_widget.setColumnCount(2)
+        table_widget.setHorizontalHeaderLabels(["Título", "ISBN"])
+
+        # Ajustar el ancho de las columnas
+        table_widget.setColumnWidth(0, 400)
+        table_widget.setColumnWidth(1, 200)
+
+        # Rellenar la tabla con datos
+        self.populate_table(libros_db, table_widget)
+
+        # Conectar el evento itemDoubleClicked a la función para editar el libro seleccionado
+        table_widget.itemDoubleClicked.connect(lambda item: self.editar_libro(libros_db, item.row(), dialog))
+
+        layout.addWidget(table_widget)
+
+        # Mostrar la ventana emergente
+        dialog.exec()
+
+    def filtrar_libros(self, libros, table_widget):
+        # Obtener el texto de búsqueda
+        search_text = self.search_input.text().lower()
+
+        # Filtrar libros que coincidan con el título o el ISBN
+        filtered_libros = [libro for libro in libros
+                           if search_text in libro['Titulo'].lower() or search_text in libro['ISBN'].lower()]
+
+        # Limpiar la tabla y volver a llenarla con los resultados filtrados
+        table_widget.setRowCount(0)
+        self.populate_table(filtered_libros, table_widget)
+
+    def populate_table(self, libros, table_widget):
+        # Rellenar la tabla con datos
+        for row, libro in enumerate(libros):
+            title_item = QTableWidgetItem(libro['Titulo'])
+            isbn_item = QTableWidgetItem(libro['ISBN'])
+
+            # Alinear los elementos en la tabla
+            title_item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            isbn_item.setTextAlignment(Qt.AlignCenter)
+
+            table_widget.insertRow(row)
+            table_widget.setItem(row, 0, title_item)
+            table_widget.setItem(row, 1, isbn_item)
+
+    def editar_libro(self, libros_db, index, parent=None):
+        # Obtener el libro seleccionado
+        libro_seleccionado = libros_db[index]
+
+        # Crear una ventana de edición
+        dialog = QDialog(parent)
+        dialog.setWindowTitle("Editar Libro")
+        dialog.setGeometry(300, 100, 600, 400)
+
+        layout = QVBoxLayout(dialog)
+
+        # Crear widgets de edición
+        form_layout = QFormLayout()
+
+        self.edit_title = QLineEdit(dialog)
+        self.edit_title.setText(libro_seleccionado['Titulo'])
+        self.edit_author = QLineEdit(dialog)
+        self.edit_author.setText(libro_seleccionado['Autor'])
+        self.edit_editorial = QLineEdit(dialog)
+        self.edit_editorial.setText(libro_seleccionado['Editorial'])
+        self.edit_isbn = QLineEdit(dialog)
+        self.edit_isbn.setEnabled(False)
+        self.edit_isbn.setText(libro_seleccionado['ISBN'])
+        self.edit_year = QLineEdit(dialog)
+        self.edit_year.setText(str(libro_seleccionado['Año de publicacion']))
+        self.edit_language = QLineEdit(dialog)
+        self.edit_language.setText(libro_seleccionado['Idioma'])
+        self.edit_copies = QLineEdit(dialog)
+        self.edit_copies.setText(str(libro_seleccionado['Ejemplares']))
+        self.edit_category = QComboBox(dialog)
+        self.edit_category.setCurrentText(libro_seleccionado['Categoria'])
+        self.load_categories(self.edit_category)
+        self.edit_synopsis = QTextEdit(dialog)
+        self.edit_synopsis.setText(libro_seleccionado['Sinopsis'])
+        # QLabel para mostrar la imagen actual
+        self.cover_label = QLabel(dialog)
+        self.cover_label.setScaledContents(True)
+        self.cover_label.setGeometry(0, 0, 200, 500)
+        default_image_path = os.path.join(basedir, f"../media/librosCovers/{libro_seleccionado['ISBN']}/coverBook.png")
+        self.mostrar_imagen_portada(default_image_path, self.cover_label.size())
+        # QPushButton para permitir la selección de una nueva imagen
+        choose_cover_button = QPushButton("Seleccionar Portada")
+        choose_cover_button.setCursor(Qt.PointingHandCursor)
+        choose_cover_button.clicked.connect(self.seleccionar_portada)
+
+
+
+        form_layout.addRow("Título:", self.edit_title)
+        form_layout.addRow("Autor:", self.edit_author)
+        form_layout.addRow("Editorial:", self.edit_editorial)
+        form_layout.addRow("ISBN:", self.edit_isbn)
+        form_layout.addRow("Año de publicación:", self.edit_year)
+        form_layout.addRow("Idioma:", self.edit_language)
+        form_layout.addRow("Ejemplares:", self.edit_copies)
+        form_layout.addRow("Categoría:", self.edit_category)
+        form_layout.addRow("Sinopsis:", self.edit_synopsis)
+        
+        form_layout.addRow("Portada:", self.cover_label)
+        form_layout.addRow("", choose_cover_button)  # Fila vacía para el botón
+        
+        layout.addLayout(form_layout)
+
+        # Agregar botones de confirmar y cancelar
+        button_layout = QHBoxLayout()
+        save_button = QPushButton("Guardar")
+        save_button.setCursor(Qt.PointingHandCursor)
+        save_button.clicked.connect(lambda: self.guardar_edicion(libros_db, index, dialog))
+        cancel_button = QPushButton("Cancelar")
+        cancel_button.setStyleSheet(
+            """
+            background-color: #D12F2F;
+            """
+        )
+        cancel_button.setCursor(Qt.PointingHandCursor)
+        cancel_button.clicked.connect(dialog.reject)
+        button_layout.addWidget(save_button)
+        button_layout.addWidget(cancel_button)
+
+        layout.addLayout(button_layout)
+
+        # Mostrar la ventana de edición
+        dialog.exec()
+
+    def mostrar_imagen_portada(self, image_path, size):
+        if os.path.exists(image_path):
+            pixmap = QPixmap(image_path)
+            reescaled_pixmap = pixmap.scaled(
+                size.width() - 50, size.height() - 50, Qt.KeepAspectRatio)
+            self.cover_label.setPixmap(reescaled_pixmap)
+            self.cover_label.setAlignment(Qt.AlignCenter)
+        else:
+            print("La ruta de la imagen no es válida o la imagen no existe.")
+
+    #seleccionar_portada(self, label, libro):
+    def seleccionar_portada(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.ReadOnly
+        file_dialog = QFileDialog()
+        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        file_dialog.setNameFilter("Images (*.png *.jpg *.bmp)")
+        file_dialog.setViewMode(QFileDialog.ViewMode.Detail)
+        if file_dialog.exec():
+            selected_files = file_dialog.selectedFiles()
+            if selected_files:
+                edit_image_path = selected_files[0]
+                self.mostrar_imagen_portada(edit_image_path, self.imagen_label.size())
+            else:
+                # Si el usuario no selecciona ningún archivo, asigna la imagen predeterminada
+                default_image_path = os.path.join(basedir, "../media/imgDefault/NO COVER.png")
+                self.image_path = default_image_path
+
+    def guardar_edicion(self, libros_db, index, dialog):
+        isbn_code = self.edit_isbn.text()
+        # Obtener los valores editados
+        nuevo_titulo = self.edit_title.text()
+        nuevo_autor = self.edit_author.text()
+        nuevo_editorial = self.edit_editorial.text()
+        nuevo_año = self.edit_year.text()
+        nuevo_idioma = self.edit_language.text()
+        nuevo_ejemplares = self.edit_copies.text()
+        nueva_categoria = self.edit_category.currentText()
+        nueva_sinopsis = self.edit_synopsis.toPlainText()
+        # Obtener más valores editados según sea necesario
+
+        directorio_imagen = os.path.join(basedir, f"../media/librosCovers/{isbn_code}")
+        if not os.path.exists(directorio_imagen):
+            os.makedirs(directorio_imagen)
+
+        ruta_imagen = os.path.join(directorio_imagen, "coverBook.png")
+        # Guardar la imagen
+        if self.cover_label.pixmap():
+            self.cover_label.pixmap().save(ruta_imagen)
+
+        # Actualizar el libro en la lista
+        libros_db[index]['Titulo'] = nuevo_titulo
+        libros_db[index]['Autor'] = nuevo_autor
+        libros_db[index]['Editorial'] = nuevo_editorial
+        libros_db[index]['Año de publicacion'] = nuevo_año
+        libros_db[index]['Idioma'] = nuevo_idioma
+        libros_db[index]['Ejemplares'] = nuevo_ejemplares
+        libros_db[index]['Categoria'] = nueva_categoria
+        libros_db[index]['Sinopsis'] = nueva_sinopsis
+        # Actualizar más campos según sea necesario
+
+        # Cargar el contenido actual del archivo JSON
+        with open(json_path, 'r', encoding="utf-8") as json_file:
+            data = json.load(json_file)
+
+        # Encontrar y actualizar el elemento específico
+        for i, libro in enumerate(data['Libros']):
+            if libro['ISBN'] == libros_db[index]['ISBN']:
+                data['Libros'][i] = libros_db[index]
+                break
+
+        # Escribir los datos actualizados en el archivo JSON
+        try:
+            with open(json_path, 'w', encoding="utf-8") as json_file:
+                json.dump(data, json_file, indent=2, ensure_ascii=False)
+            print("Datos actualizados y guardados en", json_path)
+        except Exception as e:
+            print("Error al guardar datos:", str(e))
+        # Cerrar la ventana de edición
+        
+        
+        
+        
+        dialog.accept()
+        self.search_input.clear()
+        self.actualizar_tabla(libros_db)
+
+    def actualizar_tabla(self, libros_db):
+        self.table_widget.setRowCount(len(libros_db))
+
+        for i, libro in enumerate(libros_db):
+            item_titulo = QTableWidgetItem(libro.get("Titulo", ""))
+
+            # Conectar señales utilizando un bucle for fuera de la función lambda
+
+            # Insertar elementos en la tabla
+            self.table_widget.setItem(i, 0, item_titulo)
+
+
 
     def load_database_books(self):
         try:
-          with open(json_path, "r", encoding="utf-8") as json_file:
-            data = json.load(json_file)
-            return data.get('Libros', [])
+            with open(json_path, "r", encoding="utf-8") as json_file:
+                data = json.load(json_file)
+                return data.get('Libros', [])
         except FileNotFoundError:
-          return []
+            return []
 
     def actualizar_base_de_datos(self, libros_db):
         with open(json_path, "w", encoding="utf-8") as json_file:
-          json.dump({"Libros": libros_db}, json_file, ensure_ascii=False, indent=2)
+            json.dump({"Libros": libros_db}, json_file,
+                      ensure_ascii=False, indent=2)
 
-    def load_categories(self):
-        json_path = os.path.join(os.path.dirname(__file__), "../databases/categorias.json")
+    def id_ISBN_esta_disponible(self, isbn):
+        libros = self.load_database_books()
+        for libro in libros:
+            if libro["ISBN"] == isbn:
+                return True  # Ya existe un libro con ese isbn
+        return False  # No existe un usuario libro con ese isbn
+
+    def verificarInt(self, ejemplares):
+        try:
+            int(ejemplares)
+            return True
+        except ValueError:
+            return False
+
+    def load_categories(self, label):
+        json_path = os.path.join(os.path.dirname(
+            __file__), "../databases/categorias.json")
 
         try:
             with open(json_path, "r", encoding="utf-8") as file:
@@ -471,7 +827,7 @@ class Ui_RegisterBook(QWidget):
                 for category_data in categories:
                     category = category_data.get("categoria", "")
                     if category:
-                        self.combobox_categoria.addItem(category)
+                        label.addItem(category)
         except Exception as e:
             print(f"Error al cargar las categorías: {str(e)}")
 
@@ -487,21 +843,28 @@ class Ui_RegisterBook(QWidget):
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         file_dialog.setNameFilter("Images (*.png *.jpg *.bmp)")
         file_dialog.setViewMode(QFileDialog.ViewMode.Detail)
-
+        
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
             if selected_files:
                 image_path = selected_files[0]
+                
                 self.load_and_display_image(image_path, self.imagen_label.size())
+            else:
+                # Si el usuario no selecciona ningún archivo, asigna la imagen predeterminada
+                default_image_path = os.path.join(os.path.dirname(__file__), "../media/imgDefault/NO COVER.png")
+                self.image_path = default_image_path
 
     def load_and_display_image(self, image_path, size):
         if os.path.exists(image_path):
             pixmap = QPixmap(image_path)
-            reescaled_pixmap = pixmap.scaled(size.width() - 50, size.height() - 50, Qt.KeepAspectRatio)
+            reescaled_pixmap = pixmap.scaled(
+                size.width() - 50, size.height() - 50, Qt.KeepAspectRatio)
             self.imagen_label.setPixmap(reescaled_pixmap)
             self.imagen_label.setAlignment(Qt.AlignCenter)
         else:
             print("La ruta de la imagen no es válida o la imagen no existe.")
+
 
 
     def shadow_effect(self):
@@ -512,11 +875,13 @@ class Ui_RegisterBook(QWidget):
 
         return shadow
 
+
 def main():
     app = QApplication(sys.argv)
     ui = Ui_RegisterBook()
     ui.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()

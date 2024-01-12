@@ -5,21 +5,21 @@
       "Autor": "Gabriel García Márquez",
       "Editorial": "Sudamericana",
       "ISBN": "978-84-376-0494-7",
-      "Año de publicacion": 1967,
+      "Año de publicacion": "1967",
       "Idioma": "Español",
-      "Ejemplares": 10,
-      "Categoria": "Realismo mágico",
+      "Ejemplares": "0",
+      "Categoria": "Ficción",
       "Sinopsis": "Cien años de soledad es una novela del escritor colombiano Gabriel García Márquez, ganadora del Premio Nobel de Literatura en 1982. La obra narra la historia de la familia Buendía a lo largo de siete generaciones en el ficticio pueblo de Macondo."
     },
     {
-      "Titulo": "1984",
+      "Titulo": "1984 v2",
       "Autor": "George Orwell",
       "Editorial": "Secker & Warburg",
       "ISBN": "978-0451524935",
-      "Año de publicacion": 1949,
+      "Año de publicacion": "1949",
       "Idioma": "Inglés",
-      "Ejemplares": 8,
-      "Categoria": "Distopía",
+      "Ejemplares": "7",
+      "Categoria": "Ficción",
       "Sinopsis": "1984 es una novela distópica escrita por George Orwell. La historia está ambientada en un superestado ficticio llamado Oceanía, donde un partido político totalitario, liderado por el Gran Hermano, ejerce un control total sobre todos los aspectos de la vida."
     },
     {
@@ -27,10 +27,10 @@
       "Autor": "Harper Lee",
       "Editorial": "J.B. Lippincott & Co.",
       "ISBN": "978-0061120084",
-      "Año de publicacion": 1960,
+      "Año de publicacion": "1968",
       "Idioma": "Inglés",
-      "Ejemplares": 12,
-      "Categoria": "Novela clásica",
+      "Ejemplares": "12",
+      "Categoria": "Ficción",
       "Sinopsis": "To Kill a Mockingbird es una novela escrita por Harper Lee. La historia está ambientada en la década de 1930 en el ficticio pueblo de Maycomb, Alabama, y aborda cuestiones de raza y justicia en Estados Unidos."
     },
     {
@@ -38,10 +38,10 @@
       "Autor": "Gabriel García Márquez",
       "Editorial": "Harper & Row",
       "ISBN": "978-0061120091",
-      "Año de publicacion": 1970,
+      "Año de publicacion": "1970",
       "Idioma": "Inglés",
-      "Ejemplares": 15,
-      "Categoria": "Realismo mágico",
+      "Ejemplares": "15",
+      "Categoria": "Ficción",
       "Sinopsis": "One Hundred Years of Solitude is a novel by Colombian author Gabriel García Márquez. It tells the multi-generational story of the Buendía family in the fictional town of Macondo."
     },
     {
@@ -49,11 +49,44 @@
       "Autor": "F. Scott Fitzgerald",
       "Editorial": "Charles Scribner's Sons",
       "ISBN": "978-0743273565",
-      "Año de publicacion": 1925,
+      "Año de publicacion": "1925",
       "Idioma": "Inglés",
-      "Ejemplares": 7,
-      "Categoria": "Novela clásica",
+      "Ejemplares": "7",
+      "Categoria": "Ficción",
       "Sinopsis": "The Great Gatsby is a novel by F. Scott Fitzgerald set in the summer of 1922. The story explores themes of decadence, idealism, and the American Dream."
+    },
+    {
+      "Titulo": "Cronicas de Narnia",
+      "Autor": "qweqweqweq",
+      "Editorial": "weqweqw",
+      "ISBN": "eqweqw",
+      "Año de publicacion": "12342",
+      "Idioma": "Español",
+      "Ejemplares": "21",
+      "Categoria": "Ficción",
+      "Sinopsis": "Paisaje asdsaddsa"
+    },
+    {
+      "Titulo": "Harry Potter",
+      "Autor": "GHSAD",
+      "Editorial": "Ben10Editor",
+      "ISBN": "2985-7894",
+      "Año de publicacion": "1945",
+      "Idioma": "Nariño",
+      "Ejemplares": "122",
+      "Categoria": "Ficción",
+      "Sinopsis": "No se"
+    },
+    {
+      "Titulo": "Harry Potter",
+      "Autor": "GHSAD",
+      "Editorial": "Ben10Editor",
+      "ISBN": "2985-7897",
+      "Año de publicacion": "194523",
+      "Idioma": "Nariño",
+      "Ejemplares": "12",
+      "Categoria": "Ficción",
+      "Sinopsis": "No se"
     }
   ]
 }

@@ -80,6 +80,24 @@
       "cellphone": "3126625663",
       "password": "12345",
       "rol": "usuario"
+    },
+    {
+      "uuid": "b680077c-eb55-4d09-86ce-71565f3a56fb",
+      "id_personal": 1234567890,
+      "username": "ben10",
+      "nombre": "Ben Gwen",
+      "cellphone": "3124567678",
+      "password": "123456",
+      "rol": "usuario"
+    },
+    {
+      "uuid": "ad6b85f2-99fc-49db-8ee9-2e6401a9fd69",
+      "id_personal": 1234567891,
+      "username": "ben11",
+      "nombre": "Ben Gwen",
+      "cellphone": "2318946163",
+      "password": "123456",
+      "rol": "usuario"
     }
   ]
 }

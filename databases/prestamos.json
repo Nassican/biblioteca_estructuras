@@ -1,0 +1,54 @@
+{
+  "prestamos": [
+    {
+      "uuid": "1",
+      "prestamos": [
+        {
+          "Titulo": "El señor de los anillos",
+          "Autor": "J.R.R. Tolkien",
+          "Fecha": "2019-01-01"
+        }
+      ]
+    },
+    {
+      "uuid": "8fc9eb58-0eab-4c91-8fbc-12859087f7bf",
+      "prestamos": [
+        {
+          "Titulo": "Cien años de soledad",
+          "Autor": "Gabriel García Márquez",
+          "Fecha": "2024-01-11"
+        },
+        {
+          "Titulo": "Cien años de soledad",
+          "Autor": "Gabriel García Márquez",
+          "Fecha": "2024-01-11"
+        },
+        {
+          "Titulo": "Cien años de soledad",
+          "Autor": "Gabriel García Márquez",
+          "Fecha": "2024-01-11"
+        },
+        {
+          "Titulo": "Cronicas de Narnia",
+          "Autor": "qweqweqweq",
+          "Fecha": "2024-01-11"
+        },
+        {
+          "Titulo": "1984 v2",
+          "Autor": "George Orwell",
+          "Fecha": "2024-01-11"
+        },
+        {
+          "Titulo": "Cien años de soledad",
+          "Autor": "Gabriel García Márquez",
+          "Fecha": "2024-01-11"
+        },
+        {
+          "Titulo": "Cien años de soledad",
+          "Autor": "Gabriel García Márquez",
+          "Fecha": "2024-01-11"
+        }
+      ]
+    }
+  ]
+}

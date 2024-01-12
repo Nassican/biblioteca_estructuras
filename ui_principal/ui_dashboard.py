@@ -55,10 +55,15 @@ class SideMenu(QWidget):
         self.button_home.setFixedHeight(50)
         self.button_home.setCursor(Qt.PointingHandCursor)
 
-        self.button_option1 = QPushButton(" Prestamos", icon=QIcon("./media/img/prestamo.png"), iconSize=QSize(30, 30))
-        self.button_option1.setGraphicsEffect(shadow2)
-        self.button_option1.setFixedHeight(50)
-        self.button_option1.setCursor(Qt.PointingHandCursor)
+        self.button_prestamos_admin = QPushButton(" Prestamos", icon=QIcon("./media/img/prestamo_admin.png"), iconSize=QSize(30, 30))
+        self.button_prestamos_admin.setGraphicsEffect(shadow2)
+        self.button_prestamos_admin.setFixedHeight(50)
+        self.button_prestamos_admin.setCursor(Qt.PointingHandCursor)
+
+        self.button_prestamos_user = QPushButton(" Mis prestamos", icon=QIcon("./media/img/prestamo.png"), iconSize=QSize(30, 30))
+        self.button_prestamos_user.setGraphicsEffect(shadow2)
+        self.button_prestamos_user.setFixedHeight(50)
+        self.button_prestamos_user.setCursor(Qt.PointingHandCursor)
 
         self.button_admin_libros = QPushButton(" Gestion Libros", icon=QIcon("./media/img/libros-sidemenu.png"), iconSize=QSize(30, 30))
         self.button_admin_libros.setGraphicsEffect(shadow3)
@@ -92,9 +97,10 @@ class SideMenu(QWidget):
         # Apilar los botones en el diseño vertical
         self.layout.addWidget(self.toggle_button)
         self.layout.addWidget(self.button_home)
-        self.layout.addWidget(self.button_option1)
+        self.layout.addWidget(self.button_prestamos_user)
         if self.user_data['rol'] == 'admin':
             self.layout.addWidget(self.button_admin_libros)
+            self.layout.addWidget(self.button_prestamos_admin)
         #spacer_item = QSpacerItem(20, 90, QSizePolicy.Minimum, QSizePolicy.Expanding)
         #self.layout.addItem(spacer_item)
         self.layout.addStretch()
@@ -131,7 +137,8 @@ class SideMenu(QWidget):
 
         # Configurar el texto visible de los botones en función del estado del menú
         self.button_home.setText(" Inicio" if self.is_expanded else "")
-        self.button_option1.setText(" Prestamos" if self.is_expanded else "")
+        self.button_prestamos_admin.setText(" Prestamos" if self.is_expanded else "")
+        self.button_prestamos_user.setText(" Mis Prestamos" if self.is_expanded else "")
         self.button_admin_libros.setText(" Gestión Libros" if self.is_expanded else "")
         self.button_perfil.setText(" Ver Perfil" if self.is_expanded else "")
         self.button_close_session.setText(" Cerrar sesión" if self.is_expanded else "")

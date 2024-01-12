@@ -20,7 +20,7 @@ class MiVentana(QWidget):
     def login(self):
         #Establecer layout
         grid_layout = QGridLayout(self)
-        
+
         #Definir y establecer logo
         lb_logo = QLabel(self)
         logo = QPixmap(os.path.join(basedir, "img", "logo_biblioteca2"))

@@ -11,9 +11,11 @@ sys.path.append('../')
 try:
     from ui_login import backend
     from ui_principal.ui_principal import Ui_principal
+    from ui_login.usuarios import ListaUsuarios
+    ListaUsuarios.try_cargar_usuarios_desde_json()
+    ListaUsuarios.imprimir_usuarios()
 except ImportError:
     print("Error al importar el archivo ui_principal.py")
-
 
 class MyBar(QWidget):
 
@@ -559,6 +561,8 @@ class Register(QWidget):
             #print(new_user)
             #print(f"Registro exitoso con uuid: {uuid_generated}")
             try:
+                ListaUsuarios.ingresar_ususario(identificacion=int(ident), username=username, nombre=names, celular=cellphone_number, password=password, rol="usuario")
+                ListaUsuarios.imprimir_usuarios()
                 backend.register_user_in_database(new_user)
                 alert_message.setWindowTitle("Registro exitoso")
                 alert_message.setIcon(QMessageBox.Information)
@@ -581,7 +585,6 @@ class MiVentana(QWidget):
         super().__init__()
         self.setWindowTitle("Login")
         self.setStyleSheet("background-color: white")
-
         self.setGeometry(50, 50, 800, 600)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.login()
