@@ -159,9 +159,9 @@ class Ui_RegisterBook(QWidget):
             "}"
         )
         button_añadir.clicked.connect(self.añadir_libro)
-        button_editar = QPushButton("Editar Libro")
-        button_editar.setCursor(Qt.PointingHandCursor)
-        button_editar.setStyleSheet(
+        self.button_editar = QPushButton("Editar Libro")
+        self.button_editar.setCursor(Qt.PointingHandCursor)
+        self.button_editar.setStyleSheet(
             "QPushButton {"
             "background-color: #095012; color: white; font-weight: bold;"
             "}"
@@ -172,9 +172,9 @@ class Ui_RegisterBook(QWidget):
             "background-color: #095012"
             "}"
         )
-        button_editar.clicked.connect(self.listar_libros)
+        self.button_editar.clicked.connect(self.listar_libros)
         form_botons.addWidget(button_añadir)
-        form_botons.addWidget(button_editar)
+        form_botons.addWidget(self.button_editar)
 
         self.widget_imagen = QWidget()
         self.layout_imagen = QVBoxLayout()
@@ -283,7 +283,7 @@ class Ui_RegisterBook(QWidget):
 
         h_important_buttons = QHBoxLayout()
         h_important_buttons.setContentsMargins(5, 5, 5, 5)
-        self.button_guardar = QPushButton("Guardar Libro / Cambios")
+        self.button_guardar = QPushButton("Añadir Libro")
         self.button_guardar.setEnabled(False)
         self.button_guardar.clicked.connect(self.guardar_datos)
         self.button_guardar.setCursor(Qt.PointingHandCursor)
@@ -292,11 +292,7 @@ class Ui_RegisterBook(QWidget):
             "background-color: #75D181; color: white; font-weight: bold;"
             "}"
         )
-        self.button_eliminar = QPushButton("Eliminar")
-        self.button_eliminar.setCursor(Qt.PointingHandCursor)  # D12F2F
-        self.button_eliminar.setStyleSheet(
-            "background-color: #E38E8E; color: white; font-weight: bold;")
-        self.button_eliminar.setEnabled(False)
+
         self.button_ver_prestamos = QPushButton("Ver Prestamos")
         self.button_ver_prestamos.setCursor(Qt.PointingHandCursor)
         self.button_añadir_categoria = QPushButton("Añadir Categoria")
@@ -304,7 +300,6 @@ class Ui_RegisterBook(QWidget):
         self.button_añadir_categoria.clicked.connect(self.añadir_categoria)
 
         h_important_buttons.addWidget(self.button_guardar)
-        h_important_buttons.addWidget(self.button_eliminar)
         h_important_buttons.addWidget(self.button_ver_prestamos)
         h_important_buttons.addWidget(self.button_añadir_categoria)
 
@@ -408,18 +403,6 @@ class Ui_RegisterBook(QWidget):
             "}"
             "QPushButton:pressed {"
             "background-color: #095012"
-            "}"
-        )
-        self.button_eliminar.setEnabled(True)
-        self.button_eliminar.setStyleSheet(
-            "QPushButton {"
-            "background-color: #D12F2F; color: white; font-weight: bold;"
-            "}"
-            "QPushButton::hover {"
-            "background-color: #E33E3E; "
-            "}"
-            "QPushButton:pressed {"
-            "background-color: #D12F2F"
             "}"
         )
 
@@ -564,6 +547,9 @@ class Ui_RegisterBook(QWidget):
         self.table_widget = table_widget
         table_widget.setColumnCount(2)
         table_widget.setHorizontalHeaderLabels(["Título", "ISBN"])
+        table_widget.setEditTriggers(QAbstractItemView.NoEditTriggers)  # No permite editar los datos de la tabla
+        table_widget.setAlternatingRowColors(True)
+        table_widget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         # Ajustar el ancho de las columnas
         table_widget.setColumnWidth(0, 400)
@@ -636,8 +622,8 @@ class Ui_RegisterBook(QWidget):
         self.edit_copies = QLineEdit(dialog)
         self.edit_copies.setText(str(libro_seleccionado['Ejemplares']))
         self.edit_category = QComboBox(dialog)
-        self.edit_category.setCurrentText(libro_seleccionado['Categoria'])
         self.load_categories(self.edit_category)
+        self.edit_category.setCurrentText(libro_seleccionado['Categoria'])
         self.edit_synopsis = QTextEdit(dialog)
         self.edit_synopsis.setText(libro_seleccionado['Sinopsis'])
         # QLabel para mostrar la imagen actual
@@ -670,9 +656,9 @@ class Ui_RegisterBook(QWidget):
 
         # Agregar botones de confirmar y cancelar
         button_layout = QHBoxLayout()
-        save_button = QPushButton("Guardar")
-        save_button.setCursor(Qt.PointingHandCursor)
-        save_button.clicked.connect(lambda: self.guardar_edicion(libros_db, index, dialog))
+        self.save_button = QPushButton("Guardar")
+        self.save_button.setCursor(Qt.PointingHandCursor)
+        self.save_button.clicked.connect(lambda: self.guardar_edicion(libros_db, index, dialog))
         cancel_button = QPushButton("Cancelar")
         cancel_button.setStyleSheet(
             """
@@ -681,7 +667,7 @@ class Ui_RegisterBook(QWidget):
         )
         cancel_button.setCursor(Qt.PointingHandCursor)
         cancel_button.clicked.connect(dialog.reject)
-        button_layout.addWidget(save_button)
+        button_layout.addWidget(self.save_button)
         button_layout.addWidget(cancel_button)
 
         layout.addLayout(button_layout)
@@ -768,10 +754,7 @@ class Ui_RegisterBook(QWidget):
         except Exception as e:
             print("Error al guardar datos:", str(e))
         # Cerrar la ventana de edición
-        
-        
-        
-        
+
         dialog.accept()
         self.search_input.clear()
         self.actualizar_tabla(libros_db)
@@ -786,8 +769,6 @@ class Ui_RegisterBook(QWidget):
 
             # Insertar elementos en la tabla
             self.table_widget.setItem(i, 0, item_titulo)
-
-
 
     def load_database_books(self):
         try:
@@ -864,8 +845,6 @@ class Ui_RegisterBook(QWidget):
             self.imagen_label.setAlignment(Qt.AlignCenter)
         else:
             print("La ruta de la imagen no es válida o la imagen no existe.")
-
-
 
     def shadow_effect(self):
         shadow = QGraphicsDropShadowEffect(self)

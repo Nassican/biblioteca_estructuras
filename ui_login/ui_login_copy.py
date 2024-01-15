@@ -9,11 +9,11 @@ from PySide6.QtCore import *
 basedir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append('../')
 try:
-    from ui_login import backend
-    from ui_principal.ui_principal import Ui_principal
-    from ui_login.usuarios import ListaUsuarios
+    from ui_principal.usuarios import ListaUsuarios
     ListaUsuarios.try_cargar_usuarios_desde_json()
     ListaUsuarios.imprimir_usuarios()
+    from ui_login import backend
+    from ui_principal.ui_principal import Ui_principal
 except ImportError:
     print("Error al importar el archivo ui_principal.py")
 

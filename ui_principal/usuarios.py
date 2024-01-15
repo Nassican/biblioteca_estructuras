@@ -3,8 +3,6 @@ import json
 
 path_to_json = os.path.join(os.path.dirname(__file__), "../databases/usuarios.json")
 
-
-
 class Usuario:
     def __init__(self, identificacion, username, nombre, celular, password, rol="usuario"):
         self.identificacion = identificacion
@@ -23,7 +21,7 @@ class Lista:
 
     def ingresar_ususario(self, identificacion, username, nombre, celular, password, rol):
         if self.pri == None:
-            print("Lista vacia, agregado de primero")
+            #print("Lista vacia, agregado de primero")
             self.pri = Usuario(identificacion, username,
                                nombre, celular, password, rol)
             self.ult = self.pri
@@ -93,6 +91,8 @@ class Lista:
             aux = aux.sig
 
     def imprimir_usuarios(self):
+        print("=================================== LISTA DE USUARIOS ===================================")
+        print("")
         if self.pri == None:
             print("No hay datos para imprimir.")
             return
@@ -104,15 +104,14 @@ class Lista:
         print("")
 
     def agregar_usuario_desde_json(lista, datos_usuario):
-      identificacion = datos_usuario.get("id_personal")
-      username = datos_usuario.get("username")
-      nombre = datos_usuario.get("nombre")
-      celular = datos_usuario.get("cellphone")
-      password = datos_usuario.get("password")
-      rol = datos_usuario.get("rol", "usuario")  # Por defecto, el rol es "usuario"
-
-      lista.ingresar_ususario(identificacion, username, nombre, celular, password, rol)
-
+        identificacion = datos_usuario.get("id_personal")
+        username = datos_usuario.get("username")
+        nombre = datos_usuario.get("nombre")
+        celular = datos_usuario.get("cellphone")
+        password = datos_usuario.get("password")
+        rol = datos_usuario.get("rol", "usuario")  # Por defecto, el rol es "usuario"
+    
+        lista.ingresar_ususario(identificacion, username, nombre, celular, password, rol)
 
     def cargar_usuarios_desde_json(lista):
       with open(path_to_json, "r", encoding="utf-8") as json_file:
@@ -130,6 +129,11 @@ class Lista:
         print("No se encontró el archivo de usuarios.")
       except Exception as error:
         print(f"Error al cargar los usuarios: {error}")
+
+    def actualizar_usuarios_desde_json(self):
+        self.pri = None
+        self.ult = None
+        self.cargar_prestamos_desde_json()
 
 
 ListaUsuarios = Lista()

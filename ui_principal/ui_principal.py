@@ -26,7 +26,7 @@ from PySide6.QtWidgets import (
     QFileDialog,
 )
 from PySide6.QtGui import *
-from PySide6.QtCore import Qt, QThread, Signal, QPoint, QCoreApplication, QTimer
+from PySide6.QtCore import *
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append('../')
@@ -35,11 +35,18 @@ try:
     from ui_principal.ui_dashboard import SideMenu
     from ui_principal.ui_registerbook import Ui_RegisterBook
     from ui_principal.ui_prestamos import Ui_Prestamos_admin, Ui_Prestamos_user
+    from ui_principal.libros import ListaLibros
+    from ui_principal.prestamos import ListaPrestamos
+    ListaLibros.try_cargar_libros_desde_json()
+    ListaLibros.imprimir_libros()
+    ListaPrestamos.try_cargar_prestamos_desde_json()
+    ListaPrestamos.imprimir_prestamos()
     print("Exito al importar el SideMenu")
 except ImportError:
     print("Error al importar el archivo ui_dashboard.py")
 
 class MyBar(QWidget):
+    search_triggered = Signal(str)  # Señal para la búsqueda
 
     def __init__(self, parent, user_data):
         super(MyBar, self).__init__()
@@ -117,17 +124,18 @@ class MyBar(QWidget):
 
         # Barra de búsqueda en el centro
         search_container = QWidget()
-        search_container.setFixedWidth(400)
+        search_container.setFixedWidth(550)
         search_container.setFixedHeight(30)
         search_container.setStyleSheet("background-color: #FFFFFF; border-radius: 10px;")
 
         search_layout = QHBoxLayout()
         search_layout.setSpacing(0)
 
-        search_bar = QLineEdit()
-        search_bar.setContentsMargins(0, 0, 0, 0)
-        search_bar.setStyleSheet("QLineEdit {font-size: 16px;}")
-        search_bar.setPlaceholderText("Buscar")
+        self.search_bar = QLineEdit()
+        self.search_bar.setContentsMargins(0, 0, 0, 0)
+        self.search_bar.setStyleSheet("QLineEdit {font-size: 16px;}")
+        self.search_bar.setPlaceholderText("Buscar por título, autor, ISBN, editorial, año, idioma, género...")
+        self.search_bar.textChanged.connect(self.on_search_text_changed)
 
         search_button = QPushButton()
         icon_path = os.path.join(os.path.dirname(__file__), "../media/img/lupa.png")
@@ -142,7 +150,7 @@ class MyBar(QWidget):
 
         search_layout.setContentsMargins(0, 0, 0, 0)
         search_layout.addWidget(search_button)
-        search_layout.addWidget(search_bar)
+        search_layout.addWidget(self.search_bar)
 
         search_container.setLayout(search_layout)
         bar_widget.setLayout(bar_layout)
@@ -166,6 +174,11 @@ class MyBar(QWidget):
         # Inicializa los valores para el drag and drop
         self.start = QPoint(0, 0)
         self.pressing = False
+
+    def on_search_text_changed(self, search_text):
+        print(f"Búsqueda: {search_text}")
+        # Emite la señal de búsqueda cuando el texto cambia
+        self.search_triggered.emit(search_text)
 
     # ----------------------------------------------------------------------
     # FUNCIONES DE LA BARRA DE TITULO (DRAG AND DROP)
@@ -211,20 +224,6 @@ class MyBar(QWidget):
         from ui_login.ui_login_copy import MiVentana
         window = MiVentana()
         window.show()
-
-class ImageLoader(QThread):
-    image_loaded = Signal(bytes)  # Señal para comunicar la imagen cargada
-    loading_finished = Signal()  # Señal para comunicar que la carga ha finalizado
-
-    def __init__(self, image_url):
-        super().__init__()
-        self.image_url = image_url
-
-    def run(self):
-        response = requests.get(self.image_url)
-        if response.status_code == 200:
-            self.image_loaded.emit(response.content)
-        self.loading_finished.emit()
 
 class MessageWidget(QMessageBox):
     def __init__(self):
@@ -310,11 +309,7 @@ class BookGridVistaInicio(QWidget):
         super().__init__()
         self.user_data = user_data
 
-        self.max_books_to_show = 10
-        # Configura un temporizador para actualizar los libros cada 10 segundos
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.update_books)
-        self.timer.start(10000)
+        self.max_books_to_show = 8
 
         central_layout = QVBoxLayout()
         central_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
@@ -362,6 +357,57 @@ class BookGridVistaInicio(QWidget):
         central_layout.addWidget(scroll_area)
         self.setLayout(central_layout)
 
+    def update_books_on_search(self, search_text):
+        # Actualiza la vista de libros según el texto de búsqueda
+        # Puedes implementar la lógica de filtrado aquí
+        print(f"Búsqueda: {search_text}")
+
+        data_books = self.load_book_data()
+
+        # Filtra libros según el texto de búsqueda
+        search_text = search_text.lower()
+        filtered_books = [book for book in data_books if
+                          search_text in book['Titulo'].lower()
+                          or search_text in book['Autor'].lower()
+                          or search_text in book['ISBN'].lower()
+                          or search_text in book['Año de publicacion'].lower()
+                          or search_text in book['Idioma'].lower()
+                          or search_text in book['Editorial'].lower()
+                          or search_text in book['Categoria'].lower()]
+
+        # Muestra los libros filtrados
+        self.show_filtered_books(filtered_books)
+
+    def show_filtered_books(self, filtered_books):
+        # Oculta los widgets existentes en la cuadrícula
+        for i in range(self.grid_layout.count()):
+            widget = self.grid_layout.itemAt(i).widget()
+            widget.hide()
+
+        # Vuelve a crear la cuadrícula con los libros filtrados
+        num_columns = 4
+        row = 1
+
+        title = QLabel("Se han encontrado los siguientes libros:")
+        title.setAlignment(Qt.AlignCenter)
+        title.setStyleSheet("font-size: 40px; font-weight: bold; color: black; padding: 5px; text-align: center;")
+
+        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
+        self.grid_layout.addWidget(title, 0, 0, 1, num_columns)
+
+        for i, book in enumerate(filtered_books):
+            book_widget = BookWidget(book, self.user_data)
+            col = i % num_columns
+            self.grid_layout.addWidget(book_widget, row, col)
+            if col == num_columns - 1:
+                row += 1
+
+            # Muestra el widget (o asegúrate de que esté visible)
+            book_widget.show()
+
+        # Ajusta el tamaño del contenido y la vista de desplazamiento
+        self.scroll_content.adjustSize()
+
     def load_book_data(self):
         path_to_json = os.path.join(os.path.dirname(__file__), "../databases/libros_db.json")
         try:
@@ -379,34 +425,38 @@ class BookGridVistaInicio(QWidget):
 
     def update_books(self):
         data_books = self.load_book_data()
+        print("Actualizando libros...")
+        # Nuevo widget para reemplazar el widget anterior
+        try:
+            row = 1
+            num_columns = 4
+            max_books_to_show = self.max_books_to_show
 
-        # Limpiar widgets existentes
-        while self.grid_layout.count():
-            item = self.grid_layout.takeAt(0)
-            widget = item.widget()
-            if widget:
-                widget.deleteLater()
+            # Vuelve a crear la cuadrícula con los libros filtrados
+            num_columns = 4
+            row = 1
 
-        row = 1
-        num_columns = 4
-        max_books_to_show = self.max_books_to_show
+            title = QLabel("LIBROS MAS POPULARES:")
+            title.setAlignment(Qt.AlignCenter)
+            title.setStyleSheet("font-size: 40px; font-weight: bold; color: black; padding: 5px; text-align: center;")
 
-        title = QLabel("LIBROS MÁS POPULARES")
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet("font-size: 40px; font-weight: bold; color: black; padding: 5px; text-align: center;")
+            self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
+            self.grid_layout.addWidget(title, 0, 0, 1, num_columns)
 
-        self.grid_layout.setAlignment(Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-        self.grid_layout.addWidget(title, 0, 0, 1, num_columns)
+            for i, book in enumerate(data_books[:max_books_to_show]):
+                book_widget = BookWidget(book, self.user_data)
+                col = i % num_columns
+                self.grid_layout.addWidget(book_widget, row, col)
+                if col == num_columns - 1:
+                    row += 1
 
-        for i, book_data in enumerate(data_books[:max_books_to_show]):
-            book_widget = BookWidget(book_data, self.user_data)
-            col = i % num_columns
-            self.grid_layout.addWidget(book_widget, row, col)
-            if col == num_columns - 1:
-                row += 1
+                # Muestra el widget (o asegúrate de que esté visible)
+                book_widget.show()
 
-        self.scroll_content.adjustSize()
-
+            # Ajusta el tamaño del contenido y la vista de desplazamiento
+            self.scroll_content.adjustSize()
+        except Exception as e:
+            print("Error al actualizar libros: ", e)
 
 class BookInfoWidget(QDialog):
     def __init__(self, book_data, user_data):
@@ -495,6 +545,7 @@ class BookInfoWidget(QDialog):
 
             # Lógica para realizar el préstamo y actualizar archivos JSON
             prestamo_info = {
+                "ISBN": self.book_data["ISBN"],
                 "Titulo": self.book_data["Titulo"],
                 "Autor": self.book_data["Autor"],
                 "Fecha": datetime.today().strftime('%Y-%m-%d')
@@ -505,6 +556,10 @@ class BookInfoWidget(QDialog):
 
             # Actualiza el archivo libros_db.json restando un ejemplar
             self.actualizar_libros_db()
+            ListaPrestamos.actualizar_prestamos_desde_json(self)
+            ListaPrestamos.imprimir_prestamos()
+            ListaLibros.actualizar_libros_desde_json(self)
+            ListaLibros.imprimir_libros()
 
             # Cierra el diálogo después de realizar el préstamo
             self.close()
@@ -602,7 +657,6 @@ class BookInfoWidget(QDialog):
 
     def show_widget(self):
         self.show()
-
 
 class ProfileImageWidget(QWidget):
     def __init__(self, user_data):
@@ -956,6 +1010,7 @@ class VistaUserProfile(QWidget):
         )
         self.layout_buttom.addWidget(self.boton_eliminar_cuenta)
         self.boton_eliminar_cuenta.clicked.connect(self.confirm_delete_account)
+        self.boton_prestamos.clicked.connect(self.show_prestamos_user)
 
         self.layout.addWidget(informacion_central)
         self.layout.addLayout(self.layout_buttom)
@@ -1001,6 +1056,9 @@ class VistaUserProfile(QWidget):
         from ui_login.ui_login_copy import MiVentana
         window = MiVentana()
         window.show()
+        
+    def show_prestamos_user(self):
+        self.parent.switch_vista_prestamos_user()
 
 class Dashboard(QWidget):
     def __init__(self, parent, user_data):
@@ -1128,12 +1186,21 @@ class Ui_principal(QMainWindow):
 
         # Vista de inicio de la biblioteca
         self.principal_book_grid_widget = BookGridVistaInicio(self.user_data)
+        
+        navbar.search_triggered.connect(self.principal_book_grid_widget.update_books_on_search)
+        navbar.search_bar.textChanged.connect(self.switch_principal)
+        #navbar.search_bar.editingFinished.connect(self.principal_book_grid_widget.update_books)
+
 
         # Vista de perfil de usuario
         self.perfil_usuario = VistaUserProfile(self, self.user_data)
         self.register_book = Ui_RegisterBook()
         self.prestamos_books_admin = Ui_Prestamos_admin()
-        self.prestamos_books_user = Ui_Prestamos_user(self, self.user_data)
+        self.prestamos_books_user = Ui_Prestamos_user(self.user_data)
+        # Boton conectado a un signal PySide6
+        
+        self.register_book.button_editar.clicked.connect(self.switch_register_book_admin)
+        self.register_book.button_ver_prestamos.clicked.connect(self.switch_vista_prestamos_admin)
 
         self.vista_administrador = Dashboard(self, self.user_data)
         self.vista_administrador.setStyleSheet("background-color: white;")
@@ -1153,8 +1220,17 @@ class Ui_principal(QMainWindow):
 
         self.setCentralWidget(central_widget)
         #print(self.user_data)
+        
+    def actualizar_lista_prestamos(self):
+        print("Actualizando lista de prestamos...")
+        ListaPrestamos.actualizar_prestamos_desde_json(self)
+        ListaPrestamos.imprimir_prestamos()
+        ListaLibros.actualizar_libros_desde_json(self)
+        ListaLibros.imprimir_libros()
+
 
     def switch_principal(self):
+        #self.vista_administrador.side_menu.button_home.clicked.connect(self.principal_book_grid_widget.update_books)
         self.vista_administrador.stacked_widget.setCurrentWidget(self.principal_book_grid_widget)
         self.vista_administrador.setStyleSheet("background-color: white;")
 
@@ -1168,15 +1244,18 @@ class Ui_principal(QMainWindow):
 
     def switch_vista_prestamos_admin(self):
         self.vista_administrador.stacked_widget.setCurrentWidget(self.prestamos_books_admin)
+        self.prestamos_books_admin.update_table()
         self.vista_administrador.setStyleSheet("background-color: white;")
 
     def switch_vista_prestamos_user(self):
         self.vista_administrador.stacked_widget.setCurrentWidget(self.prestamos_books_user)
+        self.prestamos_books_user.update_table()
         self.vista_administrador.setStyleSheet("background-color: white;")
 
     def switch_register_book_admin(self):
         self.vista_administrador.stacked_widget.setCurrentWidget(self.register_book)
         self.vista_administrador.setStyleSheet("background-color: white;")
+        
 
 
 

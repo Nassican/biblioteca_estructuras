@@ -1,54 +1,62 @@
 {
-  "prestamos": [
-    {
-      "uuid": "1",
-      "prestamos": [
+    "prestamos": [
         {
-          "Titulo": "El señor de los anillos",
-          "Autor": "J.R.R. Tolkien",
-          "Fecha": "2019-01-01"
+            "uuid": "8fc9eb58-0eab-4c91-8fbc-12859087f7bf",
+            "prestamos": [
+                {
+                    "ISBN": "9780061120091",
+                    "Titulo": "One Hundred Years of Solitude",
+                    "Autor": "Gabriel García Márquez",
+                    "Fecha": "2024-01-14"
+                },
+                {
+                    "ISBN": "9780061120091",
+                    "Titulo": "One Hundred Years of Solitude",
+                    "Autor": "Gabriel García Márquez",
+                    "Fecha": "2024-01-14"
+                },
+                {
+                    "ISBN": "9780451524935",
+                    "Titulo": "1984",
+                    "Autor": "George Orwell",
+                    "Fecha": "2024-01-15"
+                }
+            ]
+        },
+        {
+            "uuid": "667501f9-dc89-416f-bf7d-11376e282ad4",
+            "prestamos": [
+                {
+                    "ISBN": "9780451524935",
+                    "Titulo": "1984",
+                    "Autor": "George Orwell",
+                    "Fecha": "2024-01-14"
+                },
+                {
+                    "ISBN": "9780743273566",
+                    "Titulo": "Harry Potter y la piedra filosofal",
+                    "Autor": "J.K. Rowling",
+                    "Fecha": "2024-01-14"
+                },
+                {
+                    "ISBN": "9780547928227",
+                    "Titulo": "The Hobbit",
+                    "Autor": "J.R.R. Tolkien",
+                    "Fecha": "2024-01-14"
+                },
+                {
+                    "ISBN": "9780451524935",
+                    "Titulo": "1984",
+                    "Autor": "George Orwell",
+                    "Fecha": "2024-01-14"
+                },
+                {
+                    "ISBN": "9780451524935",
+                    "Titulo": "1984",
+                    "Autor": "George Orwell",
+                    "Fecha": "2024-01-14"
+                }
+            ]
         }
-      ]
-    },
-    {
-      "uuid": "8fc9eb58-0eab-4c91-8fbc-12859087f7bf",
-      "prestamos": [
-        {
-          "Titulo": "Cien años de soledad",
-          "Autor": "Gabriel García Márquez",
-          "Fecha": "2024-01-11"
-        },
-        {
-          "Titulo": "Cien años de soledad",
-          "Autor": "Gabriel García Márquez",
-          "Fecha": "2024-01-11"
-        },
-        {
-          "Titulo": "Cien años de soledad",
-          "Autor": "Gabriel García Márquez",
-          "Fecha": "2024-01-11"
-        },
-        {
-          "Titulo": "Cronicas de Narnia",
-          "Autor": "qweqweqweq",
-          "Fecha": "2024-01-11"
-        },
-        {
-          "Titulo": "1984 v2",
-          "Autor": "George Orwell",
-          "Fecha": "2024-01-11"
-        },
-        {
-          "Titulo": "Cien años de soledad",
-          "Autor": "Gabriel García Márquez",
-          "Fecha": "2024-01-11"
-        },
-        {
-          "Titulo": "Cien años de soledad",
-          "Autor": "Gabriel García Márquez",
-          "Fecha": "2024-01-11"
-        }
-      ]
-    }
-  ]
+    ]
 }
