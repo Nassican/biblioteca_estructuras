@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import QSize, Qt, Signal, QPropertyAnimation
 
+basedir = os.path.abspath(os.path.dirname(__file__))
+
 class SideMenu(QWidget):
     logout_signal = Signal()
     def __init__(self, parent, user_data):
@@ -50,39 +52,58 @@ class SideMenu(QWidget):
         shadow5 = self.shadow_effect()
         shadow6 = self.shadow_effect()
         # Botones del menú
-        self.button_home = QPushButton(" Inicio", icon=QIcon("./media/img/home.png"), iconSize=QSize(30, 30))
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        # Ruta relativa al directorio de la carpeta "biblioteca_estructuras"
+        img_path = os.path.join(script_dir, "..", "media", "img", "home.png")
+
+        # Convertir a una ruta que Windows pueda entender
+        img_path = os.path.normpath(img_path)
+        self.button_home = QPushButton(" Inicio", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.button_home.setGraphicsEffect(shadow1)
         self.button_home.setFixedHeight(50)
         self.button_home.setCursor(Qt.PointingHandCursor)
 
-        self.button_prestamos_admin = QPushButton(" Prestamos", icon=QIcon("./media/img/prestamo_admin.png"), iconSize=QSize(30, 30))
+        img_path = os.path.join(script_dir, "..", "media", "img", "prestamo_admin.png")
+        img_path = os.path.normpath(img_path)
+        self.button_prestamos_admin = QPushButton(" Prestamos", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.button_prestamos_admin.setGraphicsEffect(shadow2)
         self.button_prestamos_admin.setFixedHeight(50)
         self.button_prestamos_admin.setCursor(Qt.PointingHandCursor)
 
-        self.button_prestamos_user = QPushButton(" Mis prestamos", icon=QIcon("./media/img/prestamo.png"), iconSize=QSize(30, 30))
+        img_path = os.path.join(script_dir, "..", "media", "img", "prestamo.png")
+        img_path = os.path.normpath(img_path)
+        self.button_prestamos_user = QPushButton(" Mis prestamos", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.button_prestamos_user.setGraphicsEffect(shadow2)
         self.button_prestamos_user.setFixedHeight(50)
         self.button_prestamos_user.setCursor(Qt.PointingHandCursor)
 
-        self.button_admin_libros = QPushButton(" Gestion Libros", icon=QIcon("./media/img/libros-sidemenu.png"), iconSize=QSize(30, 30))
+        img_path = os.path.join(script_dir, "..", "media", "img", "libros-sidemenu.png")
+        img_path = os.path.normpath(img_path)
+        self.button_admin_libros = QPushButton(" Gestion Libros", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.button_admin_libros.setGraphicsEffect(shadow3)
         self.button_admin_libros.setFixedHeight(50)
         self.button_admin_libros.setCursor(Qt.PointingHandCursor)
 
-        self.button_perfil = QPushButton(" Ver Perfil", icon=QIcon("./media/img/user.png"), iconSize=QSize(30, 30))
+        img_path = os.path.join(script_dir, "..", "media", "img", "user.png")
+        img_path = os.path.normpath(img_path)
+        self.button_perfil = QPushButton(" Ver Perfil", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.button_perfil.setGraphicsEffect(shadow4)
         self.button_perfil.setFixedHeight(50)
         self.button_perfil.setCursor(Qt.PointingHandCursor)
 
-        self.button_close_session = QPushButton(" Cerrar sesión", icon=QIcon("./media/img/logout.svg"), iconSize=QSize(30, 30))
+        img_path = os.path.join(script_dir, "..", "media", "img", "logout.svg")
+        img_path = os.path.normpath(img_path)
+        self.button_close_session = QPushButton(" Cerrar sesión", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.button_close_session.setGraphicsEffect(shadow6)
         self.button_close_session.setFixedHeight(50)
         self.button_close_session.setCursor(Qt.PointingHandCursor)
         self.button_close_session.clicked.connect(self.close_session)
 
         # Botón para reducir o expandir el menú
-        self.toggle_button = QPushButton("", icon=QIcon("./media/img/menu.svg"), iconSize=QSize(30, 30))
+        img_path = os.path.join(script_dir, "..", "media", "img", "menu.svg")
+        img_path = os.path.normpath(img_path)
+        self.toggle_button = QPushButton("", icon=QIcon(img_path), iconSize=QSize(30, 30))
         self.toggle_button.setStyleSheet(
             "QPushButton {"
             "   text-align: left;"

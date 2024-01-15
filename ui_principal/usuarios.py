@@ -130,10 +130,10 @@ class Lista:
       except Exception as error:
         print(f"Error al cargar los usuarios: {error}")
 
-    def actualizar_usuarios_desde_json(self):
+    def actualizar_usuarios(self):
         self.pri = None
         self.ult = None
-        self.cargar_prestamos_desde_json()
+        self.cargar_usuarios_desde_json()
 
 
 ListaUsuarios = Lista()

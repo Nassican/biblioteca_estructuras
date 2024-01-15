@@ -556,9 +556,9 @@ class BookInfoWidget(QDialog):
 
             # Actualiza el archivo libros_db.json restando un ejemplar
             self.actualizar_libros_db()
-            ListaPrestamos.actualizar_prestamos_desde_json(self)
+            ListaPrestamos.actualizar_prestamos(self)
             ListaPrestamos.imprimir_prestamos()
-            ListaLibros.actualizar_libros_desde_json(self)
+            ListaLibros.actualizar_libros(self)
             ListaLibros.imprimir_libros()
 
             # Cierra el diálogo después de realizar el préstamo
@@ -1195,6 +1195,7 @@ class Ui_principal(QMainWindow):
         # Vista de perfil de usuario
         self.perfil_usuario = VistaUserProfile(self, self.user_data)
         self.register_book = Ui_RegisterBook()
+        self.register_book.button_guardar.clicked.connect(self.actualizar_lista_libros)
         self.prestamos_books_admin = Ui_Prestamos_admin()
         self.prestamos_books_user = Ui_Prestamos_user(self.user_data)
         # Boton conectado a un signal PySide6
@@ -1223,9 +1224,14 @@ class Ui_principal(QMainWindow):
         
     def actualizar_lista_prestamos(self):
         print("Actualizando lista de prestamos...")
-        ListaPrestamos.actualizar_prestamos_desde_json(self)
+        ListaPrestamos.actualizar_prestamos(self)
         ListaPrestamos.imprimir_prestamos()
-        ListaLibros.actualizar_libros_desde_json(self)
+        ListaLibros.actualizar_libros(self)
+        ListaLibros.imprimir_libros()
+        
+    def actualizar_lista_libros(self):
+        print("Actualizando lista de libros...")
+        ListaLibros.actualizar_libros(self)
         ListaLibros.imprimir_libros()
 
 

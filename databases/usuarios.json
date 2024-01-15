@@ -98,6 +98,15 @@
       "cellphone": "2318946163",
       "password": "123456",
       "rol": "usuario"
+    },
+    {
+      "uuid": "c3f6f8ad-89d9-4260-a8c7-0d0f43ffa48c",
+      "id_personal": 1597846233,
+      "username": "ben12",
+      "nombre": "Ben 100000",
+      "cellphone": "3126548952",
+      "password": "123",
+      "rol": "usuario"
     }
   ]
 }

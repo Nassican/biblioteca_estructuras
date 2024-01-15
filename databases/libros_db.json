@@ -7,7 +7,7 @@
       "ISBN": "9788437604947",
       "Año de publicacion": "1967",
       "Idioma": "Español",
-      "Ejemplares": "19",
+      "Ejemplares": "18",
       "Categoria": "Ficción",
       "Sinopsis": "Cien años de soledad es una novela del escritor colombiano Gabriel García Márquez, ganadora del Premio Nobel de Literatura en 1982. La obra narra la historia de la familia Buendía a lo largo de siete generaciones en el ficticio pueblo de Macondo."
     },
@@ -18,7 +18,7 @@
       "ISBN": "9780451524935",
       "Año de publicacion": "1949",
       "Idioma": "Inglés, Español",
-      "Ejemplares": "3",
+      "Ejemplares": "5",
       "Categoria": "Ficción",
       "Sinopsis": "1984 es una novela distópica escrita por George Orwell. La historia está ambientada en un superestado ficticio llamado Oceanía, donde un partido político totalitario, liderado por el Gran Hermano, ejerce un control total sobre todos los aspectos de la vida."
     },
@@ -40,7 +40,7 @@
       "ISBN": "9780061120091",
       "Año de publicacion": "1970",
       "Idioma": "Inglés",
-      "Ejemplares": "37",
+      "Ejemplares": "39",
       "Categoria": "Ficción",
       "Sinopsis": "One Hundred Years of Solitude is a novel by Colombian author Gabriel García Márquez. It tells the multi-generational story of the Buendía family in the fictional town of Macondo."
     },
@@ -197,6 +197,28 @@
       "Ejemplares": "13",
       "Categoria": "Fantasía",
       "Sinopsis": "The Alchemist es una novela de Paulo Coelho que sigue la búsqueda espiritual de Santiago, un joven pastor andaluz, mientras viaja por el desierto en busca de un tesoro oculto."
+    },
+    {
+      "Titulo": "Prueba",
+      "Autor": "Udenar",
+      "Editorial": "UdenarEditorials",
+      "ISBN": "12345678900",
+      "Año de publicacion": "2024",
+      "Idioma": "Español",
+      "Ejemplares": "5",
+      "Categoria": "Ciencia Ficción",
+      "Sinopsis": "Prueba de libro para la base de datos"
+    },
+    {
+      "Titulo": "Prueba23",
+      "Autor": "SoftPros",
+      "Editorial": "ColombianEditor",
+      "ISBN": "987654321",
+      "Año de publicacion": "2024",
+      "Idioma": "Ingles",
+      "Ejemplares": "2",
+      "Categoria": "Ficción",
+      "Sinopsis": "Default"
     }
   ]
 }

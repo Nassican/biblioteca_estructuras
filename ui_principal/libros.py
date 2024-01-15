@@ -134,7 +134,7 @@ class Lista:
         except Exception as e:
             print(f"El archivo de libros está vacío. {e}")
             
-    def actualizar_libros_desde_json(self, path_to_json):
+    def actualizar_libros(self, path_to_json):
         self.pri = None
         self.ult = None
         self.cargar_libros_desde_json()

@@ -561,8 +561,8 @@ class Register(QWidget):
             #print(new_user)
             #print(f"Registro exitoso con uuid: {uuid_generated}")
             try:
-                ListaUsuarios.ingresar_ususario(identificacion=int(ident), username=username, nombre=names, celular=cellphone_number, password=password, rol="usuario")
-                ListaUsuarios.imprimir_usuarios()
+                #ListaUsuarios.ingresar_ususario(identificacion=int(ident), username=username, nombre=names, celular=cellphone_number, password=password, rol="usuario")
+                #ListaUsuarios.imprimir_usuarios()
                 backend.register_user_in_database(new_user)
                 alert_message.setWindowTitle("Registro exitoso")
                 alert_message.setIcon(QMessageBox.Information)
@@ -574,6 +574,8 @@ class Register(QWidget):
                 self.line_edit_cellphone_number.setText("")
                 self.line_edit_password.setText("")
                 self.line_edit_confirm_password.setText("")
+                ListaUsuarios.actualizar_usuarios()
+                ListaUsuarios.imprimir_usuarios()
             except Exception as e:
                 print(e)
                 alert_message.setIcon(QMessageBox.Critical)

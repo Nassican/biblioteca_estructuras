@@ -286,6 +286,7 @@ class Ui_RegisterBook(QWidget):
         self.button_guardar = QPushButton("Añadir Libro")
         self.button_guardar.setEnabled(False)
         self.button_guardar.clicked.connect(self.guardar_datos)
+        #
         self.button_guardar.setCursor(Qt.PointingHandCursor)
         self.button_guardar.setStyleSheet(
             "QPushButton {"
@@ -477,6 +478,7 @@ class Ui_RegisterBook(QWidget):
                 libros_db.append(new_book)
                 self.actualizar_base_de_datos(libros_db)
 
+
                 ruta_imagen = os.path.join(directorio_imagen, "coverBook.png")
                 # Guardar la imagen
                 if self.imagen_label.pixmap():
@@ -659,6 +661,7 @@ class Ui_RegisterBook(QWidget):
         self.save_button = QPushButton("Guardar")
         self.save_button.setCursor(Qt.PointingHandCursor)
         self.save_button.clicked.connect(lambda: self.guardar_edicion(libros_db, index, dialog))
+        self.save_button.clicked.connect(lambda: self.window().actualizar_lista_libros())
         cancel_button = QPushButton("Cancelar")
         cancel_button.setStyleSheet(
             """
@@ -750,7 +753,7 @@ class Ui_RegisterBook(QWidget):
         try:
             with open(json_path, 'w', encoding="utf-8") as json_file:
                 json.dump(data, json_file, indent=2, ensure_ascii=False)
-            print("Datos actualizados y guardados en", json_path)
+            #print("Datos actualizados y guardados en", json_path)
         except Exception as e:
             print("Error al guardar datos:", str(e))
         # Cerrar la ventana de edición
@@ -815,7 +818,7 @@ class Ui_RegisterBook(QWidget):
     def actualizar_categorias_combobox(self):
         self.combobox_categoria.clear()
         self.combobox_categoria.addItem("Sin categoría")
-        self.load_categories()
+        self.load_categories(self.combobox_categoria)
 
     def select_image(self):
         options = QFileDialog.Options()
